@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Join Wish by Vyora</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Poppins:wght@300;400;500;600;700&family=Fredoka:wght@400;500;600&family=Mali:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        :root {
+            --pink-light: #FFF0F5;
+            --pink-main: #FF7EB3;
+            --pink-dark: #D6336C;
+            --pink-pastel: #FFB6C1;
+            --white: #FFFFFF;
+            --text-dark: #2C3E50;
+            --glass-white: rgba(255, 255, 255, 0.88);
+            --shadow-cute: 0 12px 30px rgba(255, 126, 179, 0.18);
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            --blue-main: #3498db;
+            --blue-dark: #2980b9;
+            --blue-light: #ebf5fb;
+            --shadow-blue: 0 12px 30px rgba(52, 152, 219, 0.18);
+        }
+
+        .theme-vip {
+            --pink-main: #FF2E93; 
+            --pink-dark: #FF7EB3;
+            --white: #111111; 
+            --text-dark: #FFFFFF;
+            --glass-white: rgba(20, 20, 20, 0.85);
+            --shadow-cute: 0 0 25px rgba(255, 46, 147, 0.4);
+            border: 1px solid rgba(255, 46, 147, 0.3) !important;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #ffffff 0%, #ffe4e1 100%);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            overflow-x: hidden;
+            transition: background 0.5s ease;
+        }
+
+        body.dark-active {
+            background: linear-gradient(135deg, #050505 0%, #1a0810 100%) !important;
+        }
+
+        .bg-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255, 126, 179, 0.3);
+            border-radius: 50%;
+            animation: floatUp linear infinite;
+        }
+
+        .dark-active .particle {
+            background: rgba(255, 46, 147, 0.4);
+            box-shadow: 0 0 10px rgba(255, 46, 147, 0.5);
+        }
+
+        @keyframes floatUp {
+            0% { 
+                transform: translateY(100vh) scale(0); 
+                opacity: 0; 
+            }
+            50% { 
+                opacity: 1; 
+            }
+            100% { 
+                transform: translateY(-10vh) scale(1); 
+                opacity: 0; 
+            }
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            background: var(--glass-white);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 182, 193, 0.4);
+            border-radius: 28px;
+            box-shadow: var(--shadow-cute);
+            padding: 30px 24px;
+            position: relative;
+            transition: var(--transition);
+            z-index: 1;
+            overflow: hidden; 
+        }
+
+        .progress-wrapper {
+            width: 100%;
+            height: 4px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 4px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            overflow: hidden;
+            display: none; 
+            border-top-left-radius: 28px;
+            border-top-right-radius: 28px;
+        }
+
+        .dark-active .progress-wrapper { 
+            background: rgba(255,255,255,0.05); 
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--pink-main), #2ecc71);
+            transition: width 0.4s ease;
+        }
+
+        .dark-active .progress-fill { 
+            background: linear-gradient(90deg, #FF2E93, #FFD700); 
+        }
+
+        .copy-link-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 126, 179, 0.15);
+            color: var(--pink-dark);
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: var(--transition);
+            z-index: 10;
+        }
+
+        .copy-link-btn:hover { 
+            background: var(--pink-main); 
+            color: white; 
+            transform: scale(1.1); 
+        }
+
+        .dark-active .copy-link-btn { 
+            background: rgba(255, 46, 147, 0.15); 
+            color: #FF2E93; 
+        }
+
+        .dark-active .copy-link-btn:hover { 
+            background: #FF2E93; 
+            color: white; 
+            box-shadow: 0 0 10px #FF2E93; 
+        }
+
+        /* ==========================================
+           🌟 UPDATE: ANIMASI CINEMATIC TRANSAKSI HALAMAN
+           ========================================== */
+        .view-section { 
+            display: none; 
+            opacity: 0; 
+        }
+
+        .view-section.active { 
+            display: block; 
+            animation: pageEnter 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; 
+        }
+
+        .view-section.exiting {
+            display: block;
+            animation: pageExit 0.4s cubic-bezier(0.5, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes pageEnter {
+            0% { 
+                opacity: 0; 
+                transform: translateY(35px) scale(0.97); 
+            }
+            100% { 
+                opacity: 1; 
+                transform: translateY(0) scale(1); 
+            }
+        }
+
+        @keyframes pageExit {
+            0% { 
+                opacity: 1; 
+                transform: translateY(0) scale(1); 
+                filter: blur(0px); 
+            }
+            100% { 
+                opacity: 0; 
+                transform: translateY(-25px) scale(0.92); 
+                filter: blur(4px); 
+            }
+        }
+
+        .admin-profile { 
+            text-align: center; 
+            margin-bottom: 25px; 
+            position: relative; 
+        }
+        
+        .avatar-frame {
+            width: 95px;
+            height: 95px;
+            margin: 0 auto 12px;
+            position: relative;
+            border-radius: 50%;
+            padding: 3px;
+            background: linear-gradient(135deg, var(--pink-main), var(--pink-dark));
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .avatar-frame.pulse-active {
+            animation: pulseAvatar 2s infinite;
+        }
+
+        .avatar-frame:hover { 
+            transform: scale(1.08) rotate(5deg); 
+        }
+
+        @keyframes pulseAvatar {
+            0% { 
+                box-shadow: 0 0 0 0 rgba(255, 126, 179, 0.7); 
+            }
+            70% { 
+                box-shadow: 0 0 0 15px rgba(255, 126, 179, 0); 
+            }
+            100% { 
+                box-shadow: 0 0 0 0 rgba(255, 126, 179, 0); 
+            }
+        }
+
+        .avatar-img { 
+            width: 100%; 
+            height: 100%; 
+            border-radius: 50%; 
+            object-fit: cover; 
+            border: 2px solid #fff; 
+        }
+
+        .web-title { 
+            font-family: 'Playfair Display', serif; 
+            font-size: 26px; 
+            font-weight: 700; 
+            color: var(--pink-dark); 
+        }
+
+        .web-subtitle { 
+            font-size: 13px; 
+            color: #7f8c8d; 
+            font-weight: 500; 
+        }
+
+        .dark-active .web-subtitle { 
+            color: #b2bec3; 
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255, 126, 179, 0.15);
+            border-radius: 18px;
+            padding: 20px;
+            margin-bottom: 20px;
+            font-size: 13.5px;
+            line-height: 1.6;
+        }
+
+        .dark-active .info-card { 
+            background: rgba(25, 25, 25, 0.6); 
+            border-color: rgba(255, 46, 147, 0.2); 
+        }
+
+        .info-title { 
+            font-size: 15px; 
+            color: var(--pink-dark); 
+            margin-bottom: 10px; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+        }
+
+        .menu-selection-grid { 
+            display: grid; 
+            grid-template-columns: 1fr; 
+            gap: 16px; 
+            margin-top: 10px; 
+        }
+        
+        /* 🌟 UPDATE: Kartu Menu Animasi Mendalam */
+        .select-card {
+            background: var(--white);
+            border: 2px solid rgba(255, 126, 179, 0.2);
+            border-radius: 20px;
+            padding: 25px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+            transform-style: preserve-3d;
+        }
+
+        .select-card:hover { 
+            border-color: var(--pink-main); 
+            box-shadow: 0 15px 25px rgba(255, 126, 179, 0.2); 
+        }
+
+        .select-card.card-vip { 
+            background: #161616; 
+            border-color: rgba(255, 46, 147, 0.2); 
+            color: #fff; 
+        }
+
+        .select-card.card-vip:hover { 
+            border-color: #FF2E93; 
+            box-shadow: 0 0 25px rgba(255, 46, 147, 0.4); 
+        }
+
+        .select-card i { 
+            font-size: 32px; 
+            color: var(--pink-main); 
+            margin-bottom: 12px; 
+            transform: translateZ(20px); 
+        }
+
+        .select-card h3 { 
+            font-family: 'Playfair Display', serif; 
+            font-size: 20px; 
+            margin-bottom: 5px; 
+            transform: translateZ(10px); 
+        }
+
+        .form-group { 
+            margin-bottom: 18px; 
+        }
+
+        .form-group label { 
+            display: block; 
+            font-size: 12.5px; 
+            font-weight: 600; 
+            color: var(--pink-dark); 
+            margin-bottom: 6px; 
+            padding-left: 4px; 
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid rgba(0,0,0,0.08);
+            border-radius: 14px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            background: rgba(255,255,255,0.8);
+            color: var(--text-dark);
+            transition: var(--transition);
+        }
+
+        .dark-active .form-control { 
+            background: rgba(30,30,30,0.8); 
+            border-color: rgba(255,46,147,0.2); 
+            color: white; 
+        }
+
+        .form-control:focus { 
+            outline: none; 
+            border-color: var(--pink-main); 
+            transform: translateY(-2px); 
+            box-shadow: 0 5px 15px rgba(255, 126, 179, 0.1); 
+        }
+
+        .dark-active .form-control:focus { 
+            box-shadow: 0 0 15px rgba(255, 46, 147, 0.2); 
+        }
+
+        .error-shake {
+            animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+            border-color: #e74c3c !important;
+            box-shadow: 0 0 10px rgba(231, 76, 60, 0.3) !important;
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translateX(-2px); }
+            20%, 80% { transform: translateX(3px); }
+            30%, 50%, 70% { transform: translateX(-5px); }
+            40%, 60% { transform: translateX(5px); }
+        }
+
+        .typewriter-text {
+            overflow: hidden;
+            border-right: .15em solid #FF2E93;
+            white-space: nowrap;
+            margin: 0 auto;
+            animation: typing 2.5s steps(30, end), blink-caret .75s step-end infinite;
+        }
+
+        @keyframes typing { 
+            from { width: 0 } 
+            to { width: 100% } 
+        }
+
+        @keyframes blink-caret { 
+            from, to { border-color: transparent } 
+            50% { border-color: #FF2E93; } 
+        }
+
+        .btn-stack { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 12px; 
+            margin-top: 25px; 
+        }
+
+        .btn-pro {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 14px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-pink-gradient { 
+            background: linear-gradient(135deg, #FF7EB3, #D6336C); 
+            color: white; 
+            box-shadow: 0 6px 15px rgba(214, 51, 108, 0.25); 
+        }
+
+        .dark-active .btn-pink-gradient { 
+            background: linear-gradient(135deg, #FF2E93, #A1005B); 
+            box-shadow: 0 6px 20px rgba(255, 46, 147, 0.35); 
+        }
+
+        .btn-pink-gradient:hover:not(:disabled) { 
+            transform: translateY(-2px); 
+            filter: brightness(1.05); 
+        }
+
+        .btn-border-only { 
+            background: transparent; 
+            border: 2px solid var(--pink-main); 
+            color: var(--pink-dark); 
+        }
+        
+        .btn-blue-gradient { 
+            background: linear-gradient(135deg, #3498db, #2980b9); 
+            color: white; 
+            box-shadow: 0 6px 15px rgba(52, 152, 219, 0.25); 
+        }
+
+        .btn-blue-gradient:hover:not(:disabled) { 
+            transform: translateY(-2px); 
+            filter: brightness(1.05); 
+        }
+
+        .btn-whatsapp-pro { 
+            background: linear-gradient(135deg, #25D366, #128C7E); 
+            color: white; 
+            box-shadow: 0 6px 15px rgba(37, 211, 102, 0.25); 
+        }
+
+        .btn-whatsapp-pro:hover:not(:disabled) { 
+            transform: translateY(-2px); 
+        }
+
+        .btn-whatsapp-pro:disabled { 
+            filter: grayscale(100%); 
+            cursor: not-allowed; 
+            opacity: 0.7; 
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-box {
+            background: #fff;
+            width: 100%;
+            max-width: 380px;
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes modalPop { 
+            from { transform: scale(0.8); opacity: 0; } 
+            to { transform: scale(1); opacity: 1; } 
+        }
+
+        .modal-header { 
+            font-family: 'Playfair Display', serif; 
+            font-size: 18px; 
+            color: #D6336C; 
+            margin-bottom: 15px; 
+            text-align: center; 
+            border-bottom: 1px dashed #FF7EB3; 
+            padding-bottom: 8px; 
+        }
+
+        .modal-list { 
+            list-style: none; 
+            font-size: 13.5px; 
+            line-height: 1.8; 
+            color: #444; 
+        }
+
+        .modal-list li { 
+            margin-bottom: 8px; 
+            display: flex; 
+            align-items: flex-start; 
+            gap: 8px; 
+        }
+
+        .modal-list i { 
+            color: #2ecc71; 
+            margin-top: 4px; 
+        }
+
+        .toast-system {
+            position: fixed;
+            top: 25px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: #FF4B4B;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 13.5px;
+            font-weight: 500;
+            box-shadow: 0 10px 25px rgba(255, 75, 75, 0.3);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 9999;
+        }
+
+        .toast-system.visible { 
+            transform: translateX(-50%) translateY(0); 
+        }
+
+        /* ==========================================
+           🌟 Arsitektur Overlay Profil (Slider)
+           ========================================== */
+        .admin-secret-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            z-index: 100;
+            clip-path: circle(0% at 50% 15%);
+            transition: clip-path 0.8s cubic-bezier(0.86, 0, 0.07, 1);
+            overflow: hidden;
+        }
+
+        .admin-secret-overlay.open { 
+            clip-path: circle(150% at 50% 15%); 
+        }
+
+        .profiles-slider-wrapper { 
+            width: 200%; 
+            height: 100%; 
+            display: flex; 
+            transition: transform 0.6s cubic-bezier(0.65, 0, 0.35, 1); 
+            will-change: transform; 
+            cursor: grab; 
+        }
+
+        .profiles-slider-wrapper:active { 
+            cursor: grabbing; 
+        }
+
+        .profile-slide { 
+            width: 50%; 
+            height: 100%; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 40px 24px; 
+            position: relative; 
+        }
+
+        .close-admin-btn {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            background: rgba(0, 0, 0, 0.05);
+            color: var(--text-dark);
+            border: none;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            z-index: 110;
+        }
+
+        .close-admin-btn:hover { 
+            background: var(--pink-dark); 
+            color: #fff; 
+            transform: rotate(90deg); 
+        }
+
+        .dark-slide .close-admin-btn { 
+            background: rgba(255,255,255,0.1); 
+            color: #fff; 
+        }
+
+        .dark-slide .close-admin-btn:hover { 
+            background: var(--blue-main); 
+        }
+
+        .admin-portrait-box {
+            width: 70%;
+            max-width: 260px;
+            aspect-ratio: 3/4;
+            background: #fff;
+            border: 2px solid #fff;
+            border-radius: 24px;
+            padding: 10px;
+            box-shadow: var(--shadow-cute);
+            position: relative;
+            margin-bottom: 25px;
+            transform: scale(0.5) rotate(-10deg);
+            opacity: 0;
+            transition: all 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition-delay: 0.2s;
+        }
+
+        .admin-portrait-box.dev-frame { 
+            border-color: var(--blue-light); 
+            box-shadow: var(--shadow-blue); 
+        }
+
+        .admin-secret-overlay.open .admin-portrait-box { 
+            transform: scale(1) rotate(0deg); 
+            opacity: 1; 
+        }
+
+        .admin-portrait-img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            border-radius: 16px; 
+        }
+
+        .admin-badge-pro {
+            position: absolute;
+            bottom: -15px;
+            right: -15px;
+            background: linear-gradient(135deg, var(--pink-main), var(--pink-dark));
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            border: 3px solid #fff;
+            box-shadow: 0 8px 20px rgba(214, 51, 108, 0.4);
+        }
+
+        .admin-badge-pro.dev-badge { 
+            background: linear-gradient(135deg, var(--blue-main), var(--blue-dark)); 
+            box-shadow: 0 8px 20px rgba(52, 152, 219, 0.4); 
+        }
+
+        .admin-details { 
+            text-align: center; 
+            width: 85%; 
+            transform: translateY(30px); 
+            opacity: 0; 
+            transition: all 0.6s ease; 
+            transition-delay: 0.4s; 
+        }
+
+        .admin-secret-overlay.open .admin-details { 
+            transform: translateY(0); 
+            opacity: 1; 
+        }
+
+        .admin-bio-text {
+            background: rgba(255, 182, 193, 0.1);
+            border: 1px dashed rgba(255, 126, 179, 0.3);
+            padding: 18px;
+            border-radius: 18px;
+            font-size: 13.5px;
+            color: #555;
+            margin: 15px 0;
+            line-height: 1.6;
+        }
+
+        .admin-bio-text.dev-bio { 
+            background: var(--blue-light); 
+            border-color: rgba(52, 152, 219, 0.3); 
+            color: var(--blue-dark); 
+        }
+
+        .slider-pagination { 
+            position: absolute; 
+            bottom: 30px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            display: flex; 
+            gap: 8px; 
+            z-index: 105; 
+        }
+
+        .pagination-dot { 
+            width: 8px; 
+            height: 8px; 
+            background: rgba(0,0,0,0.1); 
+            border-radius: 50%; 
+            transition: var(--transition); 
+            cursor: pointer; 
+        }
+
+        .pagination-dot.active { 
+            width: 20px; 
+            border-radius: 10px; 
+        }
+
+        .slider-pagination[data-active="0"] .pagination-dot.active { 
+            background: var(--pink-main); 
+        }
+
+        .slider-pagination[data-active="1"] .pagination-dot.active { 
+            background: var(--blue-main); 
+        }
+
+        .swipe-hint { 
+            position: absolute; 
+            bottom: 50px; 
+            right: 25px; 
+            font-size: 12px; 
+            color: #aaa; 
+            font-weight: 500; 
+            display: flex; 
+            align-items: center; 
+            gap: 5px; 
+            animation: hintBlink 2s infinite; 
+            z-index: 104; 
+            transition: opacity 0.3s ease; 
+        }
+
+        @keyframes hintBlink { 
+            0%, 100% { opacity: 0.3; transform: translateX(0); } 
+            50% { opacity: 1; transform: translateX(-5px); } 
+        }
+        /* ==========================================
+           🌟 NEW: DESAIN KOTAK PREVIEW LUCU & GEMES
+           ========================================== */
+        .preview-box-saluran {
+            background: #FFF0F5; border: 3px dashed #FFB6C1; border-radius: 20px;
+            padding: 25px; font-family: 'Mali', cursive; font-size: 15px; line-height: 1.8;
+            color: #555; box-shadow: inset 0 0 15px rgba(255,126,179,0.1); position: relative; margin-bottom: 15px;
+        }
+        .preview-box-saluran::before { content: '🎀'; position: absolute; top: -15px; left: -10px; font-size: 26px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
+        .preview-box-saluran::after { content: '🌸'; position: absolute; bottom: -15px; right: -10px; font-size: 26px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
+
+        .preview-box-vip {
+            background: #151515; border: 2px solid #FF2E93; border-radius: 20px; padding: 25px;
+            font-family: 'Fredoka', sans-serif; font-size: 15px; line-height: 1.8; color: #eee;
+            box-shadow: 0 0 20px rgba(255,46,147,0.2), inset 0 0 15px rgba(255,46,147,0.15); position: relative; margin-bottom: 15px;
+        }
+        .preview-box-vip::before { content: '👑'; position: absolute; top: -18px; left: -10px; font-size: 32px; filter: drop-shadow(0 0 8px #FF2E93); }
+
+        .preview-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+        .preview-label-saluran { font-weight: 700; color: var(--pink-dark); min-width: 75px; display: inline-block; }
+        .preview-value-saluran { color: #333; background: rgba(255,255,255,0.8); padding: 2px 10px; border-radius: 10px; border: 1px solid rgba(255,126,179,0.2); }
+        .preview-label-vip { font-weight: 600; color: #FF2E93; min-width: 75px; display: inline-block; }
+        .preview-value-vip { color: #fff; background: rgba(255,46,147,0.15); padding: 2px 10px; border-radius: 10px; border: 1px solid rgba(255,46,147,0.3); text-shadow: 0 0 5px rgba(255,46,147,0.4); }
+
+    </style>
+</head>
+<body>
+
+    <div class="bg-particles" id="particleEngine"></div>
+
+    <div id="appToast" class="toast-system">woopss, isi semua format yaa</div>
+
+    <div id="masterFrame" class="app-container">
+        
+        <div class="progress-wrapper" id="progWrapper">
+            <div class="progress-fill" id="progFill"></div>
+        </div>
+
+        <button class="copy-link-btn" onclick="copyBioLink()" title="Copy Link VVIP">
+            <i class="fas fa-link"></i>
+        </button>
+
+        <div class="admin-secret-overlay" id="adminPanel">
+            <button class="close-admin-btn" onclick="closeAdminProfile()">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="swipe-hint" id="swipeHint">Swipe <i class="fas fa-arrow-left"></i></div>
+
+            <div class="profiles-slider-wrapper" id="profilesSlider">
+                
+                <div class="profile-slide admin-slide" id="slideAdmin">
+                    <div class="admin-portrait-box">
+                        <img src="imut.jpg" class="admin-portrait-img" alt="Vyora Owner">
+                        <div class="admin-badge-pro"><i class="fas fa-crown"></i> Verified Owner</div>
+                    </div>
+                    <div class="admin-details">
+                        <h2 class="web-title" style="font-size:28px; margin-bottom:5px;">Vyoraa</h2>
+                        <p style="color:#D6336C; font-weight:600; font-size:14px; letter-spacing:1px;">FOUNDER OF WISH VVIP</p>
+                        <div class="admin-bio-text">
+                            "Haloo semuanya! Aku Vyora, owner dari saluran ini. Semua benefit yang aku kasih real no fek fek ya! Jangan lupa tap tombol di bawah buat kepoin dan follow IG aku."
+                        </div>
+                        <button class="btn-pro btn-pink-gradient" onclick="window.open('https://www.instagram.com/olivvcyaa?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==', '_blank')">
+                            <i class="fab fa-instagram" style="font-size:20px;"></i> Follow @olivvcyaa
+                        </button>
+                    </div>
+                </div>
+
+                <div class="profile-slide dev-slide" id="slideDev">
+                    <div class="admin-portrait-box dev-frame">
+                        <img src="jull.jpg" class="admin-portrait-img" alt="JulDev">
+                        <div class="admin-badge-pro dev-badge"><i class="fas fa-code"></i> Verified Developer</div>
+                    </div>
+                    <div class="admin-details">
+                        <h2 class="web-title" style="font-size:28px; margin-bottom:5px; color:var(--blue-dark);">JulDev</h2>
+                        <p style="color:var(--blue-main); font-weight:600; font-size:14px; letter-spacing:1px;">CREATOR & CODER OF WISH</p>
+                        <div class="admin-bio-text dev-bio">
+                            "Haloo! Gw JulDev, otopsi di balik kode web ini wkwk. Bikin web ini biar kalian enaak ngetik formatnya. Kalo webnya error kabarin gw ya lur!"
+                        </div>
+                        <button class="btn-pro btn-blue-gradient" onclick="window.open('https://www.instagram.com/rixsanjoulfiann?igsh=MWdibmlsaHR6aDJ6bw==', '_blank')">
+                            <i class="fab fa-instagram" style="font-size:20px;"></i> Follow @rixsanjoulfiann
+                        </button>
+                    </div>
+                </div>
+            </div> 
+
+            <div class="slider-pagination" id="sliderPage" data-active="0">
+                <div class="pagination-dot active" onclick="gotoSlide(0)"></div>
+                <div class="pagination-dot" onclick="gotoSlide(1)"></div>
+            </div>
+        </div>
+
+
+        <div id="viewLanding" class="view-section">
+            <div class="admin-profile">
+                <div class="avatar-frame pulse-active" onclick="openAdminProfile()" title="Tap to see Profile!">
+                    <img src="imut.jpg" class="avatar-img" alt="Vyora Profile">
+                </div>
+                <h1 class="web-title" style="font-size:28px;">Join Wish by Vyora</h1>
+                <p class="web-subtitle">.•°* &nbsp;ʷⁱˢʰ ᵇʸ ᵛʸᵒʳᵃᵃ &nbsp;*°•.</p>
+            </div>
+
+            <div class="info-card">
+                <div class="info-title"><b>𝐖𝐈𝐒𝐇 𝐈𝐓𝐔 𝐀𝐏𝐀 𝐒𝐈 𝐊𝐀?</b></div>
+                Wish ku merupakan saluran yang dimana aku bakal bagi bagi acc secara free tanpa ada biaya apapun, kecuali kamu mau join ke grub yang Vvip yang Benefitnya lebih besar daripada yang ada di Saluran, Aku udah koordinasi sama beberapa Admin grub moost, so ini aman, cuma sekedar nambah Followers gratis aja.
+                <br><br>
+                <b>𝐆𝐚𝐦𝐩𝐚𝐧𝐠𝐚𝐧нnyา 𝐠𝐢𝐧𝐢 👇🏻</b><br>
+                │ ᴋᴀᴍᴜ ᴊᴏɪɴ sᴀʟᴜʀᴀɴ ᴋʜᴜsᴜs ᴡɪsʜ ᴀᴋᴜ<br>
+                │ ᴋɪʀɪᴍ ʟɪɴᴋ ɪɢ<br>
+                │ ᴋᴀᴍᴜ ᴅᴀᴘᴀᴛ ʙᴇɴᴇғɪᴛ ᴀᴄᴄ *ɴᴏ ᴜɴғᴏʟ*
+            </div>
+
+            <div class="info-card" style="margin-bottom:25px;">
+                <div class="info-title" style="color:#e66767;"><i class="fas fa-clipboard-list"></i> <b>𝙎𝙮𝙖𝙧𝙖𝙩 𝙟𝙤𝙞𝙣?</b></div>
+                》ғᴏʟʟᴏᴡ ᴀɴᴅ ʟɪᴋᴇ ᴀᴋᴜɴ ʏᴀɴɢ ᴀᴋᴜ ᴋᴀsɪ<br>
+                》ᴋɪʀɪᴍ ʙᴜᴋᴛɪ ɴʏᴀ 1× ʟɪʜᴀᴛ ᴀᴊᴀ<br>
+                》ɴᴏ ᴜɴғᴏʟ ᴋᴇ ᴀᴋᴜɴ ʏɢ ᴀᴋᴜ ᴋᴀsɪ<br>
+                》ᴊᴏɪɴ sᴀʟᴜʀᴀɴ<br>
+                》ɴᴇᴋᴀᴛ ᴜɴғᴏʟ? ᴀᴅᴀ ᴀᴋɪʙᴀᴛɴʏᴀ sᴇɴᴅɪʀɪ, ᴋᴀʀᴇɴᴀ ɴᴏᴍᴏр ʏᴀɴɢ ᴡɪsʜ ᴘᴀsᴛɪ ᴀᴋᴜ sᴀᴠᴇ<br>
+                》ɢᴀᴜsᴀʜ ᴍᴀʀᴜᴋ, ʙᴇɴᴇғɪᴛ ᴀᴋᴜ ʏᴀɴɢ ᴀᴛᴜʀ<br>
+                》sᴇᴍᴜᴀ ᴀᴄᴄ ᴋᴇʙᴀɢɪ ʀᴀᴛᴀ<br>
+                》ᴍᴀʀᴜᴋ ᴀᴋᴜ ɢᴀ sᴇɢᴀɴ sᴇɢᴀɴ ʙᴜᴀᴛ ᴋɪᴄᴋ ᴀɴdf ᴄᴀʙᴜᴛ ᴀᴄᴄ ɴʏᴀ<br><br>
+                <b style="color:var(--pink-dark);">𝐍𝐨𝐭𝐞𝐝: 𝐮𝐝𝐚𝐡 𝐝𝐢𝐤𝐚𝐬𝐢 𝐞𝐧𝐚𝐤 𝐣𝐚𝐧𝐠𝐚𝐧 𝐬𝐞 𝐞𝐧𝐚𝐤𝐧𝐲𝐚</b>
+                <div style="text-align:center; margin-top:10px; color:#ccc;">━━━━━━━ •🌺• ━━━━━━━</div>
+            </div>
+
+            <div class="btn-stack">
+                <button class="btn-pro btn-pink-gradient" onclick="actionBtnLoading(this, 'viewSelection', 'Membuka Akses...')">
+                    <i class="fas fa-edit"></i> Create Format Registration
+                </button>
+                <button type="button" class="btn-pro" style="background: rgba(0,0,0,0.05); color: #576574; border: 1px solid rgba(0,0,0,0.05);" onclick="exitToLobby(this)">
+                    <i class="fas fa-home"></i> Kembali ke Lobi Utama
+                </button>
+            </div>
+        </div> <div id="viewSelection" class="view-section">
+            <div class="admin-profile">
+                <div class="avatar-frame">
+                    <img src="vketi.jpg" class="avatar-img" alt="Select Profile">
+                </div>
+                <h2 class="web-title">Pilih Menu Pendaftaran</h2>
+                <p class="web-subtitle">Silakan pilih jenis akses masuk registrasi</p>
+            </div>
+
+            <div class="menu-selection-grid">
+                <div class="select-card card-saluran" onclick="actionCardLoading(this, 'viewFormSaluran')" id="tiltCard1">
+                    <i class="fas fa-bullhorn"></i>
+                    <h3>Join Saluran</h3>
+                    <p style="font-size:12px; color:#7f8c8d;">Akses Saluran Wish Gratis & Seru</p>
+                </div>
+
+                <div class="select-card card-vip" onclick="actionCardLoading(this, 'viewFormVip')" id="tiltCard2">
+                    <i class="fas fa-crown" style="color:#FF2E93;"></i>
+                    <h3 style="font-family:'Playfair Display'; font-weight:700;">Join VIP</h3>
+                    <p style="font-size:12px; color:#a4b0be;">Akses Eksklusif Benefit Melimpah</p>
+                </div>
+            </div>
+            
+            <button class="btn-pro" style="background:#f1f2f6; color:#576574; margin-top:25px;" onclick="switchView('viewLanding')">
+                <i class="fas fa-chevron-left"></i> Kembali Utama
+            </button>
+        </div>
+
+
+        <div id="viewFormSaluran" class="view-section">
+            <div class="admin-profile">
+                <div class="avatar-frame">
+                    <img src="imut.jpg" class="avatar-img" alt="Saluran Profile">
+                </div>
+                <h2 class="web-title" style="font-size:22px;">JOIN SALURAN WISH VYORA</h2>
+                <p class="web-subtitle">Isi format registrasi saluran biasa</p>
+            </div>
+
+            <div class="form-group">
+                <label>Nama Lengkap</label>
+                <input type="text" id="salNama" class="form-control check-prog" placeholder="Ketik nama kamu...">
+            </div>
+            <div class="form-group">
+                <label>Umur</label>
+                <input type="number" id="salUmur" class="form-control check-prog" placeholder="Contoh: 19">
+            </div>
+            <div class="form-group">
+                <label>No HP <span style="color:#e74c3c; font-weight:normal;">( otomatis format )</span></label>
+                <input type="text" id="salHp" class="form-control check-prog smart-hp" placeholder="Contoh: 089xxxxxxxx">
+            </div>
+            <div class="form-group">
+                <label>Link / Username IG</label>
+                <input type="text" id="salIg" class="form-control check-prog" placeholder="@username_ig">
+            </div>
+
+            <div class="btn-stack">
+                <button class="btn-pro btn-border-only" onclick="toggleModal(true)">
+                    <i class="fas fa-gift"></i> Check Benefit
+                </button>
+                <button class="btn-pro btn-pink-gradient" onclick="prosesSaluranText()" id="btnCreateSaluran">
+                    <i class="fas fa-check-circle"></i> Create Teks
+                </button>
+                <button class="btn-pro" style="background:#eee; color:#666;" onclick="switchView('viewSelection')">
+                    Back Menu
+                </button>
+            </div>
+        </div>
+
+
+<div id="viewPreviewSaluran" class="view-section">
+            <div class="admin-profile">
+                <div class="avatar-frame">
+                    <img src="imut.jpg" class="avatar-img" alt="Cute Avatar">
+                </div>
+                <h2 class="web-title" style="font-size:24px; color:#D6336C; font-family: 'Mali', cursive;">✨ Preview Saluran ✨</h2>
+                <p class="web-subtitle">Format join siap dikirim</p>
+            </div>
+
+            <div id="boxDisplaySaluran"></div>
+
+            <div style="text-align:right; font-size:12px; font-family: 'Mali', cursive; color:#999; margin-bottom: 20px;">~ by, vyora</div>
+
+            <div class="btn-stack">
+                <button class="btn-pro btn-whatsapp-pro" id="btnWaSaluran" onclick="launchWhatsApp('btnWaSaluran')">
+                    <i class="fab fa-whatsapp"></i> Send to WhatsApp
+                </button>
+                <button class="btn-pro" style="background:#eee; color:#666;" onclick="switchView('viewFormSaluran')">
+                    Edit Kembali
+                </button>
+            </div>
+        </div>
+
+
+        <div id="viewFormVip" class="view-section">
+            <div class="admin-profile">
+                <div class="avatar-frame" style="background:linear-gradient(135deg, #FF2E93, #000);">
+                    <img src="vip.jpg" class="avatar-img" alt="VIP Profile">
+                </div>
+                <h2 class="web-title" style="font-size:24px; letter-spacing:0.5px;">joined Vip by Vyora</h2>
+                <p class="web-subtitle" style="color:#FF2E93; font-weight:600; letter-spacing:1px;">PREMIUM VIP REGISTRATION</p>
+            </div>
+
+            <div class="form-group">
+                <label style="color:#FF2E93;">Nama Lengkap</label>
+                <input type="text" id="vipNama" class="form-control check-prog-vip" placeholder="Ketik nama lengkap VVIP...">
+            </div>
+            <div class="form-group">
+                <label style="color:#FF2E93;">Umur</label>
+                <input type="number" id="vipUmur" class="form-control check-prog-vip" placeholder="Ketik umur...">
+            </div>
+            <div class="form-group">
+                <label style="color:#FF2E93;">No HP <span style="color:#ff7675; font-weight:normal;">( otomatis format )</span></label>
+                <input type="text" id="vipHp" class="form-control check-prog-vip smart-hp" placeholder="Contoh: 089xxxxxxxx">
+            </div>
+            <div class="form-group">
+                <label style="color:#FF2E93;">Link / Username IG</label>
+                <input type="text" id="vipIg" class="form-control check-prog-vip" placeholder="@username_vvip">
+            </div>
+
+            <div style="background:rgba(255,46,147,0.04); border:1px solid rgba(255,46,147,0.25); border-radius:16px; padding:18px; margin-top:20px; font-size:12.5px; line-height:1.6; color:#e0e0e0; max-height:160px; overflow-y:auto;">
+                <div class="typewriter-text" style="font-weight:700; color:#FF2E93; margin-bottom:8px; font-family:'Playfair Display'; display:inline-block;">👑 ℋ BENEFIT + RULES VVIP ℋ 👑</div>
+                <br>
+                》 Dapetin 100 acc per akun<br>
+                》 Khusus Top 10, Free no pay<br>
+                》 Yang bukan termasuk Top 10, wajib pay buat masuk grub<br>
+                》 Top 10 udah aku atur, sisa nya yang mau join harap pay ke aku, biar apa? sama sama untung<br>
+                》 Vvip benefit lebih tinggi<br>
+                》 Aku poling random<br>
+                》 Khusus Vvip bakal dapet benefit sesuai apa yang udah aku tentuin, jadi walaupun Vvip tetep jaga attitude, jangan maruk<br>
+                》 Bakal dapet semua? Vvip semua aku sama ratakan buat benefit Acc nya<br>
+                》 Vvip bakal aku tutup kalo udah nyentuh angka tertentu<br>
+                》 Tentu nya ada daget kalau dapat rezeki
+            </div>
+
+            <div class="btn-stack" style="margin-top:20px;">
+                <button class="btn-pro btn-pink-gradient" onclick="prosesVipText()" id="btnCreateVip">
+                    <i class="fas fa-crown"></i> Create Teks VVIP
+                </button>
+                <button class="btn-pro" style="background:#222; color:#aaa; border:1px solid #333;" onclick="switchView('viewSelection')">
+                    Back Menu
+                </button>
+            </div>
+        </div>
+
+
+<div id="viewPreviewVip" class="view-section">
+            <div class="admin-profile">
+                <div class="avatar-frame" style="background:linear-gradient(135deg, #FF2E93, #fff);">
+                    <img src="preview.jpg" class="avatar-img" alt="VVIP Final">
+                </div>
+                <h2 class="web-title" style="font-size:24px; color:#FF2E93; font-family:'Playfair Display';">Joinned wish VVIP ℋ 👑</h2>
+                <p class="web-subtitle" style="color:#aaa;">Format Berkas Premium Enkripsi Terstruktur</p>
+            </div>
+
+            <div id="boxDisplayVip"></div>
+
+            <div class="btn-stack">
+                <button class="btn-pro btn-whatsapp-pro" id="btnWaVip" onclick="launchWhatsApp('btnWaVip')">
+                    <i class="fab fa-whatsapp"></i> Send to WhatsApp
+                </button>
+                <button class="btn-pro" style="background:#222; color:#aaa; border:1px solid #333;" onclick="switchView('viewFormVip')">
+                    Edit Kembali
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="benefitModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">&lt; Benefit Join saluran &gt;</div>
+            <ul class="modal-list">
+                <li><i class="fas fa-check-circle"></i> <span>back 55 acc</span></li>
+                <li><i class="fas fa-check-circle"></i> <span>back acc baru tiap kali create account</span></li>
+                <li><i class="fas fa-check-circle"></i> <span>100 acc buat 1 akun yang admin pilih secara acak</span></li>
+            </ul>
+            <button class="btn-pro btn-pink-gradient" style="margin-top:20px; padding:10px;" onclick="toggleModal(false)">
+                Selesai Dibaca
+            </button>
+        </div>
+    </div>
+
+
+    <script>
+        const DEST_ADMIN_PHONE = "628980513003";
+        let masterGlobalText = ""; 
+        let isAnimating = false; // 🌟 MASTER LOCK: Biar user gak bisa spam klik
+
+        // ==========================================
+        // FUNGSI TOMBOL LOADING ANIMATION
+        // ==========================================
+        function actionBtnLoading(btn, targetId, loadText) {
+            if (isAnimating) return; // Kunci fungsi kalau lagi animasi
+            
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${loadText}`;
+            btn.style.transform = "scale(0.95)";
+            btn.style.opacity = "0.8";
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                btn.innerHTML = originalHtml;
+                btn.style.transform = "";
+                btn.style.opacity = "1";
+                btn.disabled = false;
+                switchView(targetId);
+            }, 600); 
+        }
+
+        function actionCardLoading(cardElement, targetId) {
+            if (isAnimating) return;
+
+            cardElement.style.transition = "all 0.3s ease";
+            cardElement.style.transform = "perspective(1000px) translateZ(-30px) scale(0.9)";
+            cardElement.style.opacity = "0.6";
+            
+            setTimeout(() => {
+                cardElement.style.transform = "";
+                cardElement.style.opacity = "";
+                switchView(targetId);
+            }, 400); 
+        }
+
+        // ==========================================
+        // LOGIKA SLIDER PROFIL (SWIPE)
+        // ==========================================
+        let currentProfileSlide = 0;
+        const totalSlides = 2;
+        const sliderWrapper = document.getElementById('profilesSlider');
+        const pagination = document.getElementById('sliderPage');
+        const dots = document.querySelectorAll('.pagination-dot');
+        const swipeHint = document.getElementById('swipeHint');
+
+        function openAdminProfile() {
+            gotoSlide(0, false); 
+            document.getElementById('adminPanel').classList.add('open');
+            swipeHint.style.opacity = '1'; 
+        }
+
+        function closeAdminProfile() {
+            document.getElementById('adminPanel').classList.remove('open');
+        }
+
+        function gotoSlide(index, withAnimation = true) {
+            currentProfileSlide = index;
+            sliderWrapper.style.transition = withAnimation ? 'transform 0.6s cubic-bezier(0.65, 0, 0.35, 1)' : 'none';
+            sliderWrapper.style.transform = `translateX(-${index * 50}%)`;
+            
+            pagination.setAttribute('data-active', index);
+            dots.forEach((dot, i) => {
+                if(i === index) { dot.classList.add('active'); } 
+                else { dot.classList.remove('active'); }
+            });
+            if(index === 1) { swipeHint.style.opacity = '0'; }
+        }
+
+        let touchStartX = 0; 
+        let touchEndX = 0;
+
+        sliderWrapper.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, {passive: true});
+        sliderWrapper.addEventListener('touchend', e => { touchEndX = e.changedTouches[0].screenX; handleSwipeGesture(); }, {passive: true});
+
+        function handleSwipeGesture() {
+            const swipeThreshold = 50; 
+            if (touchStartX - touchEndX > swipeThreshold) { if(currentProfileSlide < totalSlides - 1) { gotoSlide(currentProfileSlide + 1); } }
+            if (touchEndX - touchStartX > swipeThreshold) { if(currentProfileSlide > 0) { gotoSlide(currentProfileSlide - 1); } }
+        }
+
+        // ==========================================
+        // SISTEM PENYIMPANAN OTOMATIS
+        // ==========================================
+        function saveStateToMemory(targetViewId = null) {
+            const formData = {
+                salNama: document.getElementById('salNama').value, 
+                salUmur: document.getElementById('salUmur').value,
+                salHp: document.getElementById('salHp').value, 
+                salIg: document.getElementById('salIg').value,
+                vipNama: document.getElementById('vipNama').value, 
+                vipUmur: document.getElementById('vipUmur').value,
+                vipHp: document.getElementById('vipHp').value, 
+                vipIg: document.getElementById('vipIg').value
+            };
+            localStorage.setItem('wishDataForm', JSON.stringify(formData));
+            if(targetViewId) {
+                localStorage.setItem('wishLastView', targetViewId);
+            }
+        }
+
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', () => { 
+                input.classList.remove('error-shake'); 
+                saveStateToMemory(); 
+                updateProgressBar(); 
+            });
+        });
+
+        document.querySelectorAll('.smart-hp').forEach(input => {
+            input.addEventListener('input', function (e) {
+                let x = e.target.value.replace(/\D/g, '').match(/(\d{0,2})(\d{0,4})(\d{0,4})(\d{0,4})/);
+                if(x[1] === '08') { x[1] = '62'; }
+                e.target.value = !x[2] ? x[1] : '+' + x[1] + ' ' + x[2] + (x[3] ? ' ' + x[3] : '') + (x[4] ? ' ' + x[4] : '');
+            });
+        });
+
+        function updateProgressBar() {
+            const currentActive = document.querySelector('.view-section.active');
+            if(!currentActive) return;
+
+            let inputs = [];
+            if(currentActive.id === 'viewFormSaluran') {
+                inputs = document.querySelectorAll('.check-prog'); 
+                document.getElementById('progWrapper').style.display = 'block';
+            } else if (currentActive.id === 'viewFormVip') {
+                inputs = document.querySelectorAll('.check-prog-vip'); 
+                document.getElementById('progWrapper').style.display = 'block';
+            } else {
+                document.getElementById('progWrapper').style.display = 'none'; 
+                return;
+            }
+
+            let filled = 0;
+            inputs.forEach(inp => { if(inp.value.trim() !== "") filled++; });
+            let percentage = (filled / inputs.length) * 100;
+            document.getElementById('progFill').style.width = percentage + '%';
+        }
+
+        // ==========================================
+        // 🌟 SUPER UPDATE: ENGINE SWITCH VIEW ANTI TABRAKAN
+        // ==========================================
+        function switchView(targetId, isInstant = false) {
+            const currentActive = document.querySelector('.view-section.active');
+            const nextActive = document.getElementById(targetId);
+
+            if (currentActive === nextActive) return;
+            if (isAnimating && !isInstant) return; // 🌟 Cegah tabrakan animasi
+
+            if (currentActive) {
+                if (isInstant) {
+                    // Mode Instan: Khusus pas web direfresh biar ga numpuk
+                    currentActive.classList.remove('active', 'exiting');
+                    executeViewEnter(targetId, nextActive);
+                } else {
+                    // Mode Animasi Normal
+                    isAnimating = true; 
+                    currentActive.classList.remove('active');
+                    currentActive.classList.add('exiting'); 
+
+                    setTimeout(() => {
+                        currentActive.classList.remove('exiting');
+                        executeViewEnter(targetId, nextActive);
+                        isAnimating = false; // Buka kunci setelah selesai
+                    }, 400); 
+                }
+            } else {
+                executeViewEnter(targetId, nextActive);
+            }
+        }
+
+        function executeViewEnter(targetId, nextActive) {
+            if(targetId === 'viewFormVip' || targetId === 'viewPreviewVip') {
+                document.getElementById('masterFrame').classList.add('theme-vip');
+                document.body.classList.add('dark-active');
+            } else {
+                document.getElementById('masterFrame').classList.remove('theme-vip');
+                document.body.classList.remove('dark-active');
+            }
+
+            nextActive.classList.add('active'); 
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            saveStateToMemory(targetId);
+            updateProgressBar();
+        }
+
+        function openFormSaluran() { switchView('viewFormSaluran'); }
+        function openFormVip() { switchView('viewFormVip'); }
+        function exitVipContext() { switchView('viewSelection'); }
+        
+        function exitToLobby(btn) {
+            if(btn.disabled) return;
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Otw Lobi...`;
+            btn.disabled = true;
+
+            const masterFrame = document.getElementById('masterFrame');
+            masterFrame.style.transition = "all 0.5s cubic-bezier(0.5, 0, 0.2, 1)";
+            
+            requestAnimationFrame(() => {
+                masterFrame.style.transform = "translateY(-30px) scale(0.92)";
+                masterFrame.style.opacity = "0";
+                masterFrame.style.filter = "blur(5px)";
+            });
+
+            setTimeout(() => {
+                window.location.assign('myOnce.html'); 
+                setTimeout(() => { btn.innerHTML = originalHtml; btn.disabled = false; }, 100);
+            }, 500); 
+        }
+
+        function copyBioLink() {
+            navigator.clipboard.writeText("https://s.id/vvyora").then(() => {
+                throwToastNotification("Berhasil! Link Bio VVIP dicopy 🌸");
+            });
+        }
+
+        function toggleModal(state) { document.getElementById('benefitModal').style.display = state ? 'flex' : 'none'; }
+        
+        function throwToastNotification(msg) {
+            const toast = document.getElementById('appToast');
+            toast.innerText = msg; 
+            toast.classList.add('visible');
+            setTimeout(() => { toast.classList.remove('visible'); }, 3000);
+        }
+
+        function extractCleanInstagram(rawString) {
+            let processed = rawString.trim().replace(/\/$/, "");
+            let extractionRegex = /(?:https?:\/\/)?(?:www\.)?instagram\.com\/([a-zA-Z0-9_.]+)/i;
+            let checkMatch = processed.match(extractionRegex);
+            if (checkMatch && checkMatch[1]) { return "@" + checkMatch[1]; }
+            if (!processed.startsWith("@") && !processed.includes(" ")) { return "@" + processed; }
+            return processed;
+        }
+
+        function validateFields(inputs) {
+            let isValid = true;
+            inputs.forEach(inp => {
+                if(inp.value.trim() === '') {
+                    inp.classList.add('error-shake');
+                    setTimeout(() => { inp.classList.remove('error-shake'); }, 400); 
+                    isValid = false;
+                }
+            });
+            if(!isValid) { throwToastNotification("woopss, kolom merah wajib diisi yaa!"); }
+            return isValid;
+        }
+
+        // ==========================================
+        // UNICODE FONTS CONVERSION
+        // ==========================================
+        function applyUnicodeSansBold(text) {
+            const dictionary = {'A':'𝗔','B':'𝗕','C':'𝗖','D':'𝗗','E':'𝗘','F':'𝗙','G':'𝗚','H':'𝗛','I':'𝗜','J':'𝗝','K':'𝗞','L':'𝗟','M':'𝗠','N':'𝗡','O':'𝗢','P':'𝗣','Q':'𝗤','R':'𝗥','S':'𝗦','T':'𝗧','U':'𝗨','V':'𝗩','W':'𝗪','X':'𝗫','Y':'𝗬','Z':'𝗭','a':'𝗮','b':'𝗯','c':'𝗰','d':'𝗱','e':'𝗲','f':'𝗳','g':'𝗴','h':'𝗵','i':'𝗶','j':'𝗷','k':'𝗸','l':'𝗹','m':'𝗺','n':'𝗻','o':'𝗼','p':'𝗽','q':'𝗾','r':'𝗿','s':'𝘀','t':'𝘁','u':'𝘂','v':'𝘃','w':'𝘄','x':'𝘅','y':'𝘆','z':'𝘇','0':'𝟬','1':'𝟭','2':'𝟮','3':'𝟯','4':'𝟰','5':'𝟱','6':'𝟲','7':'𝟳','8':'𝟴','9':'𝟵'};
+            return text.replace(/[A-Za-z0-9]/g, mapChar => dictionary[mapChar] || mapChar);
+        }
+
+        function applyUnicodeSerifBoldItalic(text) {
+            const dictionary = {'A':'𝑨','B':'𝑩','C':'𝑪','D':'𝑫','E':'𝑬','F':'𝑭','G':'𝑮','H':'𝑯','I':'𝑰','J':'𝑱','K':'𝑲','L':'𝑳','M':'𝑴','N':'𝑵','O':'𝑶','P':'𝑷','Q':'𝑸','R':'𝑹','S':'𝑺','T':'𝑻','U':'𝑼','V':'𝑽','W':'𝑾','X':'𝑿','Y':'𝒀','Z':'𝑹','a':'𝒂','b':'𝒃','c':'𝒄','d':'𝒅','e':'𝒆','f':'𝒇','g':'𝒈','h':'𝒉','i':'𝒊','j':'𝒋','k':'𝒌','l':'𝒍','m':'𝒎','n':'𝒏','o':'𝒐','p':'𝒑','q':'𝒒','r':'𝒓','s':'𝒔','t':'𝒕','u':'𝒖','v':'𝒗','w':'𝒘','x':'𝒙','y':'𝒚','z':'𝒛'};
+            return text.replace(/[A-Za-z]/g, mapChar => dictionary[mapChar] || mapChar);
+        }
+
+        // ==========================================
+        // PROCESSING DATA & PREVIEW (DENGAN IS_INSTANT)
+        // ==========================================
+        function prosesSaluranText(isInstant = false) {
+            const inputs = [
+                document.getElementById('salNama'), 
+                document.getElementById('salUmur'), 
+                document.getElementById('salHp'), 
+                document.getElementById('salIg')
+            ];
+            
+            // Bypass validasi murni pas lagi refresh doang
+            if(!isInstant && !validateFields(inputs)) return; 
+
+            const cleanIg = extractCleanInstagram(inputs[3].value);
+
+            document.getElementById('boxDisplaySaluran').innerHTML = `
+                <div class="preview-box-saluran">
+                    <div style="text-align:center; font-weight:700; margin-bottom:15px; color:var(--pink-dark); font-size:18px; border-bottom: 2px dashed #FFB6C1; padding-bottom: 10px;">
+                        ✨ Registrasi Saluran ✨
+                    </div>
+                    <div class="preview-row"><span class="preview-label-saluran">Nama</span> <span>:</span> <span class="preview-value-saluran">${inputs[0].value}</span></div>
+                    <div class="preview-row"><span class="preview-label-saluran">Umur</span> <span>:</span> <span class="preview-value-saluran">${inputs[1].value} Thn</span></div>
+                    <div class="preview-row"><span class="preview-label-saluran">No HP</span> <span>:</span> <span class="preview-value-saluran">${inputs[2].value}</span></div>
+                    <div class="preview-row"><span class="preview-label-saluran">Link IG</span> <span>:</span> <span class="preview-value-saluran" style="color:var(--pink-dark); font-weight:700;">${cleanIg}</span></div>
+                </div>
+            `;
+
+            masterGlobalText = `🌺 ${applyUnicodeSerifBoldItalic("Registrasi Saluran Wish")} 🌺\n──────────────\n${applyUnicodeSansBold("Nama")} : ${inputs[0].value}\n${applyUnicodeSansBold("Umur")} : ${inputs[1].value} Tahun\n${applyUnicodeSansBold("No HP")} : ${inputs[2].value}\n${applyUnicodeSansBold("Link IG")} : ${cleanIg}\n\nby, vyora`;
+
+            switchView('viewPreviewSaluran', isInstant); 
+            if(!isInstant) fireConfetti(); 
+        }
+
+        function prosesVipText(isInstant = false) {
+            const inputs = [
+                document.getElementById('vipNama'), 
+                document.getElementById('vipUmur'), 
+                document.getElementById('vipHp'), 
+                document.getElementById('vipIg')
+            ];
+            
+            if(!isInstant && !validateFields(inputs)) return; 
+
+            const cleanIg = extractCleanInstagram(inputs[3].value);
+
+            document.getElementById('boxDisplayVip').innerHTML = `
+                <div class="preview-box-vip">
+                    <div style="text-align:center; font-weight:600; margin-bottom:15px; color:#FF2E93; font-size:18px; border-bottom: 2px solid rgba(255,46,147,0.3); padding-bottom: 10px;">
+                        💎 Joinned Wish VVIP 💎
+                    </div>
+                    <div class="preview-row"><span class="preview-label-vip">Nama</span> <span>:</span> <span class="preview-value-vip">${inputs[0].value}</span></div>
+                    <div class="preview-row"><span class="preview-label-vip">Umur</span> <span>:</span> <span class="preview-value-vip">${inputs[1].value} Thn</span></div>
+                    <div class="preview-row"><span class="preview-label-vip">No HP</span> <span>:</span> <span class="preview-value-vip">${inputs[2].value}</span></div>
+                    <div class="preview-row"><span class="preview-label-vip">Link IG</span> <span>:</span> <span class="preview-value-vip" style="font-weight:500;">${cleanIg}</span></div>
+                </div>
+            `;
+
+            masterGlobalText = `👑 ${applyUnicodeSerifBoldItalic("Joinned wish VVIP")} 👑\n──────────────\n${applyUnicodeSansBold("Nama")} : ${inputs[0].value}\n${applyUnicodeSansBold("Umur")} : ${inputs[1].value} Tahun\n${applyUnicodeSansBold("No HP")} : ${inputs[2].value}\n${applyUnicodeSansBold("Link IG")} : ${cleanIg}`;
+
+            switchView('viewPreviewVip', isInstant); 
+            if(!isInstant) fireConfetti(); 
+        }
+
+        function fireConfetti() { 
+            confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#FF7EB3', '#D6336C', '#FF2E93', '#ffffff'] }); 
+        }
+
+        function launchWhatsApp(btnId) {
+            if(!masterGlobalText) return;
+            const btn = document.getElementById(btnId);
+            const originalHtml = btn.innerHTML; 
+            btn.disabled = true; 
+            
+            let timeleft = 5;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Tunggu ${timeleft}s...`;
+            
+            let downloadTimer = setInterval(function(){
+                timeleft -= 1; 
+                btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Tunggu ${timeleft}s...`;
+                if(timeleft <= 0){ 
+                    clearInterval(downloadTimer); btn.disabled = false; btn.innerHTML = originalHtml; 
+                }
+            }, 1000);
+
+            const encodedString = encodeURIComponent(masterGlobalText);
+            window.open(`https://wa.me/${DEST_ADMIN_PHONE}?text=${encodedString}`, '_blank');
+        }
+
+        // ==========================================
+        // 🌟 INIT RESTORE LOGIC (ANTI TABRAKAN SAAT REFRESH)
+        // ==========================================
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedData = localStorage.getItem('wishDataForm');
+            if(savedData) {
+                const parsedData = JSON.parse(savedData);
+                ['salNama','salUmur','salHp','salIg','vipNama','vipUmur','vipHp','vipIg'].forEach(id => {
+                    if(document.getElementById(id)) { document.getElementById(id).value = parsedData[id] || ''; }
+                });
+            }
+
+            const lastView = localStorage.getItem('wishLastView');
+            if(lastView && document.getElementById(lastView)) {
+                if(lastView === 'viewPreviewSaluran') { 
+                    // Panggil fungsi secara INSTAN tanpa animasi jeda biar ngga tumpang tindih
+                    switchView('viewFormSaluran', true); 
+                    prosesSaluranText(true); 
+                } 
+                else if (lastView === 'viewPreviewVip') { 
+                    switchView('viewFormVip', true); 
+                    prosesVipText(true); 
+                } 
+                else { 
+                    switchView(lastView, true); 
+                }
+            } else {
+                switchView('viewLanding', true);
+            }
+
+            const engine = document.getElementById('particleEngine');
+            for(let i = 0; i < 15; i++) {
+                let p = document.createElement('div');
+                p.className = 'particle'; 
+                let size = Math.random() * 15 + 5;
+                p.style.width = size + 'px'; p.style.height = size + 'px';
+                p.style.left = Math.random() * 100 + 'vw'; 
+                p.style.animationDuration = (Math.random() * 10 + 5) + 's';
+                p.style.animationDelay = Math.random() * 5 + 's'; 
+                engine.appendChild(p);
+            }
+
+            document.querySelectorAll('.select-card').forEach(card => {
+                card.addEventListener('mousemove', e => {
+                    let rect = card.getBoundingClientRect();
+                    let x = e.clientX - rect.left; let y = e.clientY - rect.top;
+                    let rotateX = ((y / rect.height) - 0.5) * -15; let rotateY = ((x / rect.width) - 0.5) * 15;
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+                });
+                card.addEventListener('mouseleave', () => { card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`; });
+            });
+
+            gotoSlide(0, false);
+        });
+    </script>
+</body>
+</html>

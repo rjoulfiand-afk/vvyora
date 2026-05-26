@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Cek Acc | Wish VVIP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --pink-main: #FF7EB3;
+            --pink-dark: #D6336C;
+            --glass-white: rgba(255, 255, 255, 0.92);
+            --shadow-cute: 0 15px 35px rgba(255, 126, 179, 0.2);
+            --transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            --bg-top: #ffffff;
+            --bg-bottom: #ffe4e1;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+            color: #2C3E50; min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            padding: 15px; overflow: hidden;
+        }
+
+        /* 🌸 PARTIKEL BACKGROUND VYORA */
+        .bg-particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+        .particle { position: absolute; background: rgba(255, 126, 179, 0.3); border-radius: 50%; animation: floatUp linear infinite; }
+        @keyframes floatUp { 0% { transform: translateY(100vh) scale(0); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateY(-10vh) scale(1); opacity: 0; } }
+
+        /* 💎 MASTER CONTAINER (GLASSMORPHISM VAULT) */
+        .master-container {
+            width: 100%; max-width: 440px; height: 90vh; max-height: 850px;
+            background: var(--glass-white); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 32px;
+            box-shadow: var(--shadow-cute);
+            display: flex; flex-direction: column; position: relative; z-index: 1; overflow: hidden;
+            animation: cinematicEnter 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        @keyframes cinematicEnter { 0% { opacity: 0; transform: translateY(40px) scale(0.95); filter: blur(5px); } 100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); } }
+
+        /* HEADER & SEARCH */
+        .header-box { padding: 30px 20px 15px; text-align: center; border-bottom: 1px solid rgba(255, 126, 179, 0.15); position: relative; background: rgba(255,255,255,0.5); z-index: 2; }
+        .btn-close { position: absolute; top: 20px; left: 20px; width: 35px; height: 35px; border-radius: 50%; border: none; background: rgba(0,0,0,0.04); color: #576574; cursor: pointer; transition: var(--transition); }
+        .btn-close:hover { background: #ff4757; color: #fff; transform: rotate(90deg); }
+        
+        .header-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--pink-dark); margin-bottom: 15px; line-height: 1.3; padding: 0 30px; }
+        
+        .search-wrapper { position: relative; margin-bottom: 12px; }
+        .search-input { width: 100%; padding: 12px 15px 12px 40px; background: #fff; border: 1px solid rgba(255,126,179,0.3); border-radius: 16px; font-family: 'Poppins'; outline: none; box-shadow: 0 4px 10px rgba(0,0,0,0.02); transition: 0.3s; }
+        .search-input:focus { border-color: var(--pink-main); box-shadow: 0 0 15px rgba(255, 126, 179, 0.15); }
+        .search-icon { position: absolute; top: 50%; left: 15px; transform: translateY(-50%); color: #bdc3c7; }
+
+        /* CATEGORY PILLS (TABS) */
+        .category-scroller { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; padding-bottom: 5px; }
+        .category-scroller::-webkit-scrollbar { display: none; }
+        .pill-btn { padding: 8px 16px; background: rgba(0,0,0,0.03); border: 1px solid transparent; border-radius: 20px; font-size: 11px; font-weight: 600; color: #7f8c8d; cursor: pointer; white-space: nowrap; transition: var(--transition); }
+        .pill-btn.active { background: rgba(255, 126, 179, 0.1); border-color: rgba(255, 126, 179, 0.3); color: var(--pink-dark); }
+
+        /* 🔥 GRID CARDS LAYOUT (NEW DESIGN) */
+        .list-container { 
+            flex: 1; overflow-y: auto; padding: 15px 20px; 
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; 
+            scrollbar-width: none; align-content: flex-start;
+        }
+        .list-container::-webkit-scrollbar { display: none; }
+
+        .acc-card {
+            background: #fff; border: 1px solid rgba(0,0,0,0.04); border-radius: 20px; padding: 18px 10px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03); cursor: pointer; transition: var(--transition);
+            opacity: 0; transform: translateY(20px); position: relative;
+            animation: slideUpList 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes slideUpList { to { opacity: 1; transform: translateY(0); } }
+
+        .acc-card:hover { border-color: rgba(255, 126, 179, 0.4); transform: translateY(-5px) scale(1.02); box-shadow: 0 12px 25px rgba(255, 126, 179, 0.15); }
+        .acc-card:active { transform: scale(0.95); }
+
+        .acc-avatar { 
+            width: 70px; height: 70px; border-radius: 50%; object-fit: cover; 
+            background: #f1f2f6; border: 3px solid var(--pink-main); box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            margin-bottom: 12px; padding: 2px;
+        }
+        
+        .acc-username { font-size: 13px; font-weight: 700; color: #2C3E50; margin-bottom: 5px; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .acc-status { display: flex; align-items: center; justify-content: center; gap: 4px; font-size: 10px; color: #7f8c8d; font-weight: 500; }
+        
+        .pulse-dot { width: 6px; height: 6px; background-color: #ff4757; border-radius: 50%; position: relative; }
+        .pulse-dot::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: #ff4757; border-radius: 50%; animation: pulseAnim 1.5s infinite ease-out; }
+        @keyframes pulseAnim { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(2.5); opacity: 0; } }
+
+        /* 📸 IG PROFILE OVERLAY (CLONE DESIGN) */
+        .ig-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: #fff; z-index: 100; display: flex; flex-direction: column;
+            transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .ig-overlay.open { transform: translateX(0); }
+
+        .ig-header-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 20px; border-bottom: 1px solid #efefef;
+        }
+        .ig-header-bar i { font-size: 18px; color: #262626; cursor: pointer; }
+        .ig-header-username { font-weight: 700; font-size: 16px; color: #262626; display: flex; align-items: center; gap: 5px;}
+
+        .ig-profile-info { padding: 20px; display: flex; align-items: center; gap: 20px; }
+        .ig-profile-img { width: 85px; height: 85px; border-radius: 50%; object-fit: cover; border: 3px solid #efefef; padding: 2px; }
+        .ig-stats-container { flex: 1; display: flex; justify-content: space-around; text-align: center; }
+        .ig-stat-box { display: flex; flex-direction: column; }
+        .ig-stat-num { font-weight: 700; font-size: 16px; color: #262626; }
+        .ig-stat-label { font-size: 12px; color: #262626; }
+
+        .ig-bio { padding: 0 20px 15px; font-size: 13px; color: #262626; line-height: 1.4; }
+        .ig-bio-name { font-weight: 700; margin-bottom: 2px; }
+        
+        .ig-buttons { padding: 0 20px 20px; display: flex; gap: 8px; }
+        .ig-btn { flex: 1; padding: 8px; border: none; border-radius: 8px; font-family: 'Poppins'; font-weight: 600; font-size: 13px; cursor: pointer; transition: 0.2s; }
+        .ig-btn-primary { background: #0095f6; color: #fff; }
+        .ig-btn-secondary { background: #efefef; color: #262626; }
+
+        .ig-tabs { display: flex; border-top: 1px solid #efefef; }
+        .ig-tab { flex: 1; text-align: center; padding: 12px; border-bottom: 1px solid #262626; color: #262626; font-size: 20px; }
+        .ig-tab.inactive { color: #8e8e8e; border-bottom: none; }
+
+        .ig-content-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; color: #262626; }
+        .ig-content-empty .icon-circle { width: 80px; height: 80px; border-radius: 50%; border: 2px solid #262626; display: flex; justify-content: center; align-items: center; font-size: 35px; }
+        .ig-content-empty h3 { font-size: 22px; font-weight: 700; }
+
+        /* ⏳ SKELETON SHIMMER LOADING */
+        .skeleton-card { background: #fff; border-radius: 20px; padding: 20px 10px; display: flex; flex-direction: column; align-items: center; gap: 10px; border: 1px solid rgba(0,0,0,0.03); }
+        .shimmer { background: #f6f7f8; background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%); background-repeat: no-repeat; background-size: 800px 100%; animation: shimmerAnim 1.5s infinite linear forwards; }
+        @keyframes shimmerAnim { 0% { background-position: -468px 0; } 100% { background-position: 468px 0; } }
+        .skel-avatar { width: 70px; height: 70px; border-radius: 50%; }
+        .skel-text-1 { width: 80%; height: 12px; border-radius: 4px; }
+        .skel-text-2 { width: 50%; height: 10px; border-radius: 4px; }
+
+        /* ANIMASI EXIT */
+        .exiting { animation: cinematicExit 0.5s cubic-bezier(0.5, 0, 0.2, 1) forwards; }
+        @keyframes cinematicExit { 0% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); } 100% { opacity: 0; transform: translateY(-30px) scale(0.92); filter: blur(5px); } }
+    </style>
+</head>
+<body>
+
+    <div class="bg-particles" id="particleEngine"></div>
+
+    <div class="master-container" id="mainFrame">
+        
+        <div class="header-box">
+            <button class="btn-close" onclick="exitToLobby(this)" title="Kembali"><i class="fas fa-times"></i></button>
+            <h1 class="header-title">acc bt and fb nyaa disini yaaw</h1>
+            
+            <div class="search-wrapper">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="searchInput" class="search-input" placeholder="Cari username acc..." onkeyup="filterAccounts()">
+            </div>
+
+            <div class="category-scroller">
+                <button class="pill-btn active" onclick="setCategory('all', this)">Semua Acc</button>
+                <button class="pill-btn" onclick="setCategory('notif', this)">Paling Rame 🔴</button>
+                <button class="pill-btn" onclick="setCategory('pengikut', this)">Ada Pengikut 👥</button>
+            </div>
+        </div>
+
+        <div class="list-container" id="accListArea">
+            <div class="skeleton-card"><div class="skel-avatar shimmer"></div><div class="skel-text-1 shimmer"></div><div class="skel-text-2 shimmer"></div></div>
+            <div class="skeleton-card"><div class="skel-avatar shimmer"></div><div class="skel-text-1 shimmer"></div><div class="skel-text-2 shimmer"></div></div>
+            <div class="skeleton-card"><div class="skel-avatar shimmer"></div><div class="skel-text-1 shimmer"></div><div class="skel-text-2 shimmer"></div></div>
+            <div class="skeleton-card"><div class="skel-avatar shimmer"></div><div class="skel-text-1 shimmer"></div><div class="skel-text-2 shimmer"></div></div>
+        </div>
+
+        <div class="ig-overlay" id="igOverlay">
+            <div class="ig-header-bar">
+                <i class="fas fa-arrow-left" onclick="closeIgProfile()"></i>
+                <div class="ig-header-username">
+                    <span id="igTitleName">username</span>
+                    <i class="fas fa-check-circle" style="color:#0095f6; font-size:12px;"></i>
+                </div>
+                <i class="fas fa-ellipsis-h"></i>
+            </div>
+
+            <div class="ig-profile-info">
+                <img src="" id="igProfileImg" class="ig-profile-img" alt="Profile" onerror="this.src='https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'">
+                <div class="ig-stats-container">
+                    <div class="ig-stat-box">
+                        <span class="ig-stat-num">0</span>
+                        <span class="ig-stat-label">Kiriman</span>
+                    </div>
+                    <div class="ig-stat-box">
+                        <span class="ig-stat-num" id="igFollowers">0</span>
+                        <span class="ig-stat-label">Pengikut</span>
+                    </div>
+                    <div class="ig-stat-box">
+                        <span class="ig-stat-num" id="igFollowing">0</span>
+                        <span class="ig-stat-label">Mengikuti</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ig-bio">
+                <div class="ig-bio-name" id="igBioName">Name</div>
+                <div>BT / FB / WISH ACC #by Vyora ✨<br>No Unfoll or Block 🚫<br>Jumlah pengikut hanya kloning, bisa cek di akunnya</div>
+            </div>
+
+            <div class="ig-buttons">
+                <button class="ig-btn ig-btn-primary">Ikuti</button>
+                <button class="ig-btn ig-btn-secondary">Pesan</button>
+                <button class="ig-btn ig-btn-secondary"><i class="fas fa-user-plus"></i></button>
+            </div>
+
+            <div class="ig-tabs">
+                <div class="ig-tab"><i class="fas fa-th"></i></div>
+                <div class="ig-tab inactive"><i class="fas fa-play"></i></div>
+                <div class="ig-tab inactive"><i class="fas fa-user-tag"></i></div>
+            </div>
+
+            <div class="ig-content-empty">
+                <div class="icon-circle"><i class="fas fa-camera"></i></div>
+                <h3>Belum Ada Kiriman</h3>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // ==========================================
+        // 💾 DATABASE ACC (DENGAN KUSTOM FOTO)
+        // ==========================================
+        // Isi kolom "foto" dengan nama file gambar yang ada di folder lu
+        // Kalau kosong (""), otomatis pake foto siluet blank IG
+        const accDatabase = [
+            { user: "ceceelana", status: "6 Notifikasi", type: "notif", foto: "ceceelana.jpg" },
+            { user: "gabbythaac", status: "4 Notifikasi", type: "notif", foto: "gabbythaac.jpg" },
+            { user: "zviyaave", status: "5 Notifikasi", type: "notif", foto: "zviyaave.jpg" },
+            { user: "nneyylaav", status: "1 Pengikut dan 5 lainnya", type: "pengikut", foto: "nneyylaav.jpg" },
+            { user: "caramellathev", status: "5 Notifikasi", type: "notif", foto: "caramellathev.jpg" },
+            { user: "yvluncyaa", status: "6 Notifikasi", type: "notif", foto: "yvluncyaa.jpg" },
+            { user: "byancvya", status: "6 Notifikasi", type: "notif", foto: "byancvya.jpg" },
+            { user: "adelwayyss", status: "2 Pengikut dan 6 lainnya", type: "pengikut", foto: "adelwayyss.jpg" },
+            { user: "cecelavven", status: "7 Notifikasi", type: "notif", foto: "cecelavven.jpg" },
+            { user: "lerterrrjio", status: "8 Notifikasi", type: "notif", foto: "lerterrrjio.jpg" },
+            { user: "evelynncvla", status: "7 Notifikasi", type: "notif", foto: "evelynncvla.jpg" },
+            { user: "lettviaa", status: "6 Notifikasi", type: "notif", foto: "lettviaa.jpg" },
+            { user: "cchelseaahss", status: "9 Pengikut dan 10 lainnya", type: "pengikut", foto: "cchelseaahss.jpg" },
+            { user: "rllychytya", status: "6 Notifikasi", type: "notif", foto: "rllychytya.jpg" },
+            { user: "girlsdyyv", status: "7 Notifikasi", type: "notif", foto: "girlsdyyv.jpg" },
+            { user: "jeyyyscca", status: "3 Notifikasi", type: "notif", foto: "jeyyyscca.jpg" },
+            { user: "vinvyaanca", status: "1 Pengikut dan 7 lainnya", type: "pengikut", foto: "vinvyaanca.jpg" },
+            { user: "vynnvyla", status: "3 Pengikut dan 10 lainnya", type: "pengikut", foto: "vynnvyla.jpg" },
+            { user: "dntheaaya", status: "4 Notifikasi", type: "notif", foto: "dntheaaya.jpg" },
+            { user: "debbygrbyy", status: "5 Notifikasi", type: "notif", foto: "debbygrbyy.jpg" },
+            { user: "joseevflowws", status: "6 Notifikasi", type: "notif", foto: "joseevflowws.jpg" },
+            { user: "jennyfercrysnta", status: "7 Notifikasi", type: "notif", foto: "jennyfercrysnta.jpg" },
+            { user: "graciaviro", status: "7 Notifikasi", type: "notif", foto: "graciaviro.jpg" },
+            { user: "mandaclaudyaa", status: "8 Notifikasi", type: "notif", foto: "mandaclaudyaa.jpg" },
+            { user: "sandracathrerina", status: "6 Notifikasi", type: "notif", foto: "sandracathrerina.jpg" },
+            { user: "kayylhyaa", status: "13 Notifikasi", type: "notif", foto: "kayylhyaa.jpg" },
+            { user: "dllvinnyaa", status: "1 Pengikut dan 7 lainnya", type: "pengikut", foto: "dllvinnyaa.jpg" },
+            { user: "vitaavylya", status: "5 Notifikasi", type: "notif", foto: "vitaavylya.jpg" },
+            { user: "vlaachiooo", status: "4 Notifikasi", type: "notif", foto: "vlaachiooo.jpg" },
+            { user: "moniccalvv", status: "6 Notifikasi", type: "notif", foto: "moniccalvv.jpg" },
+            { user: "vnnvyhaa", status: "7 Notifikasi", type: "notif", foto: "vnnvyhaa.jpg" },
+            { user: "qqillyaa", status: "4 Notifikasi", type: "notif", foto: "qqillyaa.jpg" },
+            { user: "vladheaa", status: "3 Pengikut dan 27 lainnya", type: "pengikut", foto: "vladheaa.jpg" },
+            { user: "nauraawytl", status: "5 Pengikut dan 30 lainnya", type: "pengikut", foto: "nauraawytl.jpg" },
+            { user: "deboracarllya", status: "4 Pengikut dan 27 lainnya", type: "pengikut", foto: "deboracarllya.jpg" },
+            { user: "evvelynnzy", status: "3 Pengikut dan 11 lainnya", type: "pengikut", foto: "evvelynnzy.jpg" },
+            { user: "samanthagabriiel", status: "6 Pengikut dan 21 lainnya", type: "pengikut", foto: "samanthagabriiel.jpg" },
+            { user: "botchatcyber", status: "9 Pengikut dan 13 lainnya", type: "pengikut", foto: "botchatcyber.jpg" },
+            { user: "barrnadda", status: "10 Pengikut dan 17 lainnya", type: "pengikut", foto: "barrnadda.jpg" },
+            { user: "nmichaellaa", status: "16 Pengikut dan 17 lainnya", type: "pengikut", foto: "nmichaellaa.jpg" },
+            { user: "jacquelynnzy", status: "3 Pengikut dan 30 lainnya", type: "pengikut", foto: "jacquelynnzy.jpg" },
+            { user: "elvinnayl", status: "3 Pengikut dan 11 lainnya", type: "pengikut", foto: "elvinnayl.jpg" },
+            { user: "eyyapnna", status: "4 Pengikut dan 23 lainnya", type: "pengikut", foto: "eyyapnna.jpg" },
+            { user: "wlnonnaa", status: "4 Pengikut dan 22 lainnya", type: "pengikut", foto: "wlnonnaa.jpg" },
+            { user: "gabriellaajcvy", status: "4 Pengikut dan 9 lainnya", type: "pengikut", foto: "gabriellaajcvy.jpg" },
+            { user: "lycnncyya", status: "3 Pengikut dan 20 lainnya", type: "pengikut", foto: "lycnncyya.jpg" },
+            { user: "nnylwylaa", status: "5 Pengikut dan 7 lainnya", type: "pengikut", foto: "nnylwylaa.jpg" },
+            { user: "caryamelle", status: "3 Pengikut dan 9 lainnya", type: "pengikut", foto: "caryamelle.jpg" },
+            { user: "lvvyzznn", status: "4 Pengikut dan 23 lainnya", type: "pengikut", foto: "lvvyzznn.jpg" },
+            { user: "keisyaazya", status: "3 Pengikut dan 17 lainnya", type: "pengikut", foto: "keisyaazya.jpg" },
+            { user: "lwnatasyaa", status: "8 Pengikut dan 31 lainnya", type: "pengikut", foto: "lwnatasyaa.jpg" },
+            { user: "ellzbthee", status: "4 Pengikut dan 24 lainnya", type: "pengikut", foto: "ellzbthee.jpg" },
+            { user: "nauraacyntva", status: "3 Pengikut dan 24 lainnya", type: "pengikut", foto: "nauraacyntva.jpg" },
+            { user: "licyaazcva", status: "1 Pengikut dan 23 lainnya", type: "pengikut", foto: "licyaazcva.jpg" },
+            { user: "karelldroo", status: "2 obrolan dan 37 lainnya", type: "pengikut", foto: "karelldroo.jpg" },
+            { user: "princsslyly", status: "5 Pengikut dan 27 lainnya", type: "pengikut", foto: "princsslyly.jpg" },
+            { user: "lovelyyIna", status: "5 Pengikut dan 23 lainnya", type: "pengikut", foto: "lovelyyIna.jpg" },
+            { user: "jjessychaa", status: "1 Pengikut dan 26 lainnya", type: "pengikut", foto: "jjessychaa.jpg" },
+            { user: "cnnxtyaa", status: "7 Pengikut dan 29 lainnya", type: "pengikut", foto: "cnnxtyaa.jpg" },
+            { user: "ylwnathaliaa", status: "2 Pengikut dan 23 lainnya", type: "pengikut", foto: "ylwnathaliaa.jpg" },
+            { user: "vllyonaa", status: "1 Pengikut dan 26 lainnya", type: "pengikut", foto: "vllyonaa.jpg" },
+            { user: "cacatapasyyza", status: "1 Pengikut dan 24 lainnya", type: "pengikut", foto: "cacatapasyyza.jpg" }
+        ];
+
+        let currentCategory = 'all';
+
+        // ==========================================
+        // 🔄 ENGINE RENDER (GRID CARDS)
+        // ==========================================
+        function renderAccounts(data) {
+            const container = document.getElementById('accListArea');
+            container.innerHTML = ""; 
+
+            if(data.length === 0) {
+                container.innerHTML = `<div style="text-align:center; color:#95a5a6; margin-top:50px; grid-column: span 2;"><i class="fas fa-ghost" style="font-size:30px; margin-bottom:10px;"></i><br>Yah, acc nya ngga ketemu lur.</div>`;
+                return;
+            }
+
+            data.forEach((acc, index) => {
+                let delay = index * 0.05; 
+                let dotColor = acc.type === 'notif' ? '#ff4757' : '#2ecc71';
+                
+                // 🔥 LOGIKA FOTO PINTAR
+                // Kalau foto kosong di database, pakai blank profile
+                let finalFoto = acc.foto ? acc.foto : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png';
+
+                let cardHTML = `
+                    <div class="acc-card" style="animation-delay: ${delay}s;" onclick="openIgProfile('${acc.user}', '${finalFoto}')" data-type="${acc.type}">
+                        <img src="${finalFoto}" class="acc-avatar" alt="${acc.user}" onerror="this.src='https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'">
+                        <div class="acc-username">${acc.user}</div>
+                        <div class="acc-status">
+                            <span class="pulse-dot" style="background-color: ${dotColor};"></span> ${acc.status}
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += cardHTML;
+            });
+        }
+
+        function setCategory(type, btnElement) {
+            document.querySelectorAll('.pill-btn').forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+            
+            currentCategory = type;
+            filterAccounts();
+        }
+
+        function filterAccounts() {
+            let searchInput = document.getElementById('searchInput').value.toLowerCase();
+            
+            let filteredData = accDatabase.filter(acc => {
+                let matchType = (currentCategory === 'all') || (acc.type === currentCategory);
+                let matchText = acc.user.toLowerCase().includes(searchInput);
+                return matchType && matchText;
+            });
+
+            renderAccounts(filteredData);
+        }
+
+        // ==========================================
+        // 📱 IG PROFILE SIMULATION
+        // ==========================================
+        function openIgProfile(username, fotoSrc) {
+            document.getElementById('igTitleName').innerText = username;
+            document.getElementById('igBioName').innerText = username.charAt(0).toUpperCase() + username.slice(1);
+            
+            // Set foto profil sesuai data parameter dari card yang diklik
+            document.getElementById('igProfileImg').src = fotoSrc;
+
+            // Generate Random Followers & Following biar keliatan real
+            let randomFollowers = (Math.random() * (55.5 - 10.1) + 10.1).toFixed(1) + "RB";
+            let randomFollowing = Math.floor(Math.random() * 500) + 10;
+            
+            document.getElementById('igFollowers').innerText = randomFollowers;
+            document.getElementById('igFollowing').innerText = randomFollowing;
+
+            // Slide In Animasi Instagram
+            document.getElementById('igOverlay').classList.add('open');
+        }
+
+        function closeIgProfile() {
+            document.getElementById('igOverlay').classList.remove('open');
+        }
+
+        // ==========================================
+        // 🚪 ANIMASI KELUAR KE LOBI
+        // ==========================================
+        function exitToLobby(btn) {
+            if(btn.disabled) return;
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin" style="font-size:14px;"></i>`;
+            btn.disabled = true;
+
+            document.getElementById('mainFrame').classList.add('exiting');
+
+            setTimeout(() => {
+                window.location.assign('myOnce.html'); 
+                setTimeout(() => { btn.innerHTML = originalHtml; btn.disabled = false; }, 100);
+            }, 500); 
+        }
+
+        // ==========================================
+        // 🚀 INIT SELESAI SKELETON LOADING
+        // ==========================================
+        window.addEventListener('DOMContentLoaded', () => {
+            const engine = document.getElementById('particleEngine');
+            for(let i = 0; i < 15; i++) {
+                let p = document.createElement('div');
+                p.className = 'particle'; 
+                let size = Math.random() * 15 + 5;
+                p.style.width = size + 'px'; p.style.height = size + 'px';
+                p.style.left = Math.random() * 100 + 'vw'; 
+                p.style.animationDuration = (Math.random() * 10 + 5) + 's';
+                p.style.animationDelay = Math.random() * 5 + 's'; 
+                engine.appendChild(p);
+            }
+
+            // Tunggu 1.2 detik, baru data real-nya keluar
+            setTimeout(() => {
+                renderAccounts(accDatabase);
+            }, 1200);
+        });
+    </script>
+ 
+</body>
+</html>

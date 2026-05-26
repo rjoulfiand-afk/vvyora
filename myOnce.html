@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>My once by Vyora</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --pink-main: #FF7EB3;
+            --pink-dark: #D6336C;
+            --glass-white: rgba(255, 255, 255, 0.85);
+            --shadow-cute: 0 15px 35px rgba(255, 126, 179, 0.2);
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #ffffff 0%, #ffe4e1 100%);
+            color: #2C3E50;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow: hidden; 
+        }
+
+        /* Animasi Background Partikel */
+        .bg-particles {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 0;
+        }
+        .particle {
+            position: absolute; background: rgba(255, 126, 179, 0.3);
+            border-radius: 50%; animation: floatUp linear infinite;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+        }
+
+        /* Main Container Lobi */
+        .lobby-container {
+            width: 100%;
+            max-width: 420px;
+            background: var(--glass-white);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 30px;
+            box-shadow: var(--shadow-cute);
+            padding: 40px 25px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            animation: cinematicEnter 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        @keyframes cinematicEnter {
+            0% { opacity: 0; transform: translateY(40px) scale(0.95); filter: blur(5px); }
+            100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+        }
+
+        /* Efek Keluar */
+        .lobby-container.exiting {
+            animation: cinematicExit 0.5s cubic-bezier(0.5, 0, 0.2, 1) forwards;
+        }
+        @keyframes cinematicExit {
+            0% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+            100% { opacity: 0; transform: translateY(-30px) scale(0.95); filter: blur(5px); }
+        }
+
+        /* Profil Vyora */
+        .avatar-frame {
+            width: 110px; height: 110px; margin: 0 auto 15px; position: relative;
+            border-radius: 50%; padding: 4px;
+            background: linear-gradient(135deg, var(--pink-main), var(--pink-dark));
+            box-shadow: 0 10px 25px rgba(255, 126, 179, 0.3);
+            animation: pulseAvatar 2.5s infinite;
+        }
+        .avatar-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid #fff; }
+        
+        @keyframes pulseAvatar {
+            0% { box-shadow: 0 0 0 0 rgba(255, 126, 179, 0.5); }
+            70% { box-shadow: 0 0 0 20px rgba(255, 126, 179, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 126, 179, 0); }
+        }
+
+        .lobby-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--pink-dark);
+            margin-bottom: 5px;
+            letter-spacing: 0.5px;
+        }
+        .lobby-subtitle { font-size: 14px; color: #7f8c8d; font-weight: 500; margin-bottom: 35px; }
+
+        /* Grid Pilihan Menu */
+        .menu-grid {
+            display: grid; grid-template-columns: 1fr; gap: 18px; perspective: 1000px;
+        }
+
+        .menu-card {
+            background: #ffffff;
+            border: 2px solid rgba(255, 126, 179, 0.15);
+            border-radius: 22px;
+            padding: 25px 20px;
+            display: flex; align-items: center; justify-content: space-between;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-card:hover {
+            border-color: var(--pink-main);
+            box-shadow: 0 15px 30px rgba(255, 126, 179, 0.2);
+            transform: translateZ(20px) translateY(-5px);
+        }
+
+        .menu-card:active {
+            transform: translateZ(-10px) scale(0.97);
+        }
+
+        .card-icon {
+            width: 55px; height: 55px; border-radius: 16px;
+            background: rgba(255, 126, 179, 0.1); color: var(--pink-main);
+            display: flex; justify-content: center; align-items: center;
+            font-size: 24px; transition: var(--transition);
+        }
+        .menu-card:hover .card-icon {
+            background: linear-gradient(135deg, var(--pink-main), var(--pink-dark));
+            color: white; transform: rotate(-10deg) scale(1.1);
+        }
+
+        .card-text { text-align: left; flex: 1; margin-left: 15px; }
+        .card-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: #2C3E50; margin-bottom: 4px; }
+        .card-desc { font-size: 12px; color: #95a5a6; font-weight: 500; }
+
+        .card-arrow { color: #bdc3c7; font-size: 18px; transition: var(--transition); }
+        .menu-card:hover .card-arrow { color: var(--pink-main); transform: translateX(5px); }
+
+        /* Loader Overlay */
+        .card-loader {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex; justify-content: center; align-items: center;
+            font-size: 24px; color: var(--pink-main);
+            opacity: 0; visibility: hidden; transition: opacity 0.3s ease;
+            z-index: 5;
+        }
+        .menu-card.loading .card-loader { opacity: 1; visibility: visible; }
+
+        /* Label Hot/VVIP */
+        .badge-hot {
+            position: absolute; top: 12px; right: 12px;
+            background: #ff4757; color: white;
+            font-size: 10px; font-weight: 700; padding: 4px 8px;
+            border-radius: 10px; letter-spacing: 0.5px;
+            animation: pulseBadge 1.5s infinite;
+        }
+        @keyframes pulseBadge {
+            0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="bg-particles" id="particleEngine"></div>
+
+    <div class="lobby-container" id="lobbyBox">
+        <div class="admin-profile">
+            <div class="avatar-frame">
+                <img src="imut.jpg" class="avatar-img" alt="Vyora Profile">
+            </div>
+            <h1 class="lobby-title">My once by Vyora</h1>
+            <p class="lobby-subtitle">Selamat datang, silakan pilih menu di bawah</p>
+        </div>
+
+        <div class="menu-grid">
+            
+            <div class="menu-card" onclick="goToPage(this, 'cekacc.html')">
+                <div class="card-loader"><i class="fas fa-spinner fa-spin"></i></div>
+                <div class="card-icon"><i class="fas fa-user-check"></i></div>
+                <div class="card-text">
+                    <div class="card-title">Cek Acc</div>
+                    <div class="card-desc">Cek status akun dan progress</div>
+                </div>
+                <div class="card-arrow"><i class="fas fa-chevron-right"></i></div>
+            </div>
+
+            <div class="menu-card" onclick="goToPage(this, 'vyoraa.html')">
+                <div class="badge-hot">VVIP</div>
+                <div class="card-loader"><i class="fas fa-spinner fa-spin"></i></div>
+                <div class="card-icon"><i class="fas fa-wand-magic-sparkles"></i></div>
+                <div class="card-text">
+                    <div class="card-title">Wish</div>
+                    <div class="card-desc">Daftar saluran & akses VVIP</div>
+                </div>
+                <div class="card-arrow"><i class="fas fa-chevron-right"></i></div>
+            </div>
+
+            <div class="menu-card" onclick="goToPage(this, 'member.html')">
+                <div class="card-loader"><i class="fas fa-spinner fa-spin"></i></div>
+                <div class="card-icon"><i class="fas fa-users"></i></div>
+                <div class="card-text">
+                    <div class="card-title">Member</div>
+                    <div class="card-desc">Daftar verifikasi member Wish</div>
+                </div>
+                <div class="card-arrow"><i class="fas fa-chevron-right"></i></div>
+            </div>
+
+            <div class="menu-card" onclick="goToPage(this, 'admindevelop.html')">
+                <div class="card-loader"><i class="fas fa-spinner fa-spin"></i></div>
+                <div class="card-icon"><i class="fas fa-code"></i></div>
+                <div class="card-text">
+                    <div class="card-title">Vyora & Dev</div>
+                    <div class="card-desc">Profil Owner dan Developer</div>
+                </div>
+                <div class="card-arrow"><i class="fas fa-chevron-right"></i></div>
+            </div>
+
+            <div class="menu-card" onclick="goToPage(this, 'nexus.html')">
+                <div class="card-loader"><i class="fas fa-spinner fa-spin"></i></div>
+                <div class="card-icon"><i class="fas fa-heart" style="color: #FF7EB3; filter: drop-shadow(0 2px 5px rgba(255,126,179,0.4));"></i></div>
+                <div class="card-text">
+                    <div class="card-title">Nexus Connect</div>
+                    <div class="card-desc">Live chat & klaim benefit VVIP</div>
+                </div>
+                <div class="card-arrow"><i class="fas fa-chevron-right"></i></div>
+            </div>
+
+        </div>
+
+    <script>
+        // Logika Pindah Halaman Super Mulus
+        function goToPage(cardElement, targetUrl) {
+            // 1. Munculin animasi loading muter di dalem card yang diklik
+            cardElement.classList.add('loading');
+            
+            // 2. Bikin efek kartu ketekan masuk (3D)
+            cardElement.style.transform = "perspective(1000px) translateZ(-30px) scale(0.95)";
+            
+            // 3. Tunggu bentar (0.5 detik) buat nunjukin loadingnya
+            setTimeout(() => {
+                // 4. Tambahin animasi keluar (exiting) ke kontainer utama biar ngeblur dan ngilang
+                document.getElementById('lobbyBox').classList.add('exiting');
+                
+                // 5. Tunggu animasi keluarnya selesai (0.4 detik), baru lempar ke link tujuan
+                setTimeout(() => {
+                    window.location.href = targetUrl;
+                }, 400);
+
+            }, 500);
+        }
+
+        // Generate Partikel Background
+        window.addEventListener('DOMContentLoaded', () => {
+            const engine = document.getElementById('particleEngine');
+            for(let i = 0; i < 15; i++) {
+                let p = document.createElement('div');
+                p.className = 'particle'; 
+                let size = Math.random() * 15 + 5;
+                p.style.width = size + 'px'; 
+                p.style.height = size + 'px';
+                p.style.left = Math.random() * 100 + 'vw'; 
+                p.style.animationDuration = (Math.random() * 10 + 5) + 's';
+                p.style.animationDelay = Math.random() * 5 + 's'; 
+                engine.appendChild(p);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Member List | Wish VVIP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --pink-main: #FF7EB3;
+            --pink-dark: #D6336C;
+            --glass-white: rgba(255, 255, 255, 0.92);
+            --shadow-cute: 0 15px 35px rgba(255, 126, 179, 0.2);
+            --transition: all 0.3s ease;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #ffffff 0%, #ffe4e1 100%);
+            color: #2C3E50; min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            padding: 15px; overflow: hidden;
+        }
+
+        .bg-particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+        .particle { position: absolute; background: rgba(255, 126, 179, 0.3); border-radius: 50%; animation: floatUp linear infinite; }
+        @keyframes floatUp { 0% { transform: translateY(100vh) scale(0); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateY(-10vh) scale(1); opacity: 0; } }
+
+        /* Master Container */
+        .master-container {
+            width: 100%; max-width: 440px; height: 90vh; max-height: 800px;
+            background: var(--glass-white); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 32px;
+            box-shadow: var(--shadow-cute);
+            display: flex; flex-direction: column; position: relative; z-index: 1; overflow: hidden;
+        }
+
+        /* Header Publik */
+        .header-box { padding: 30px 20px 20px; text-align: center; border-bottom: 1px solid rgba(255, 126, 179, 0.15); position: relative; }
+        .btn-close { position: absolute; top: 20px; left: 20px; width: 35px; height: 35px; border-radius: 50%; border: none; background: rgba(0,0,0,0.04); color: #576574; cursor: pointer; transition: var(--transition); }
+        .btn-close:hover { background: #ff4757; color: #fff; transform: rotate(90deg); }
+        .header-title { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: var(--pink-dark); display: flex; justify-content: center; align-items: center; gap: 8px; margin-bottom: 5px; }
+        .icon-admin-trigger { cursor: pointer; transition: 0.3s; }
+        .icon-admin-trigger:active { transform: scale(0.8); }
+        
+        /* Search */
+        .search-wrapper { margin-top: 15px; position: relative; }
+        .search-input { width: 100%; padding: 12px 15px 12px 40px; background: rgba(255,255,255,0.6); border: 1px solid rgba(255,126,179,0.3); border-radius: 16px; font-family: 'Poppins'; outline: none; }
+        .search-icon { position: absolute; top: 50%; left: 15px; transform: translateY(-50%); color: #bdc3c7; }
+
+        /* List Publik */
+        .member-list-container { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; scrollbar-width: none; padding-bottom: 80px; }
+        .member-list-container::-webkit-scrollbar { display: none; }
+        .member-card { background: #fff; border: 1px solid rgba(0,0,0,0.04); border-radius: 18px; padding: 15px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
+        .member-info { display: flex; align-items: center; gap: 12px; }
+        .member-avatar { width: 45px; height: 45px; border-radius: 50%; background: linear-gradient(135deg, #f1f2f6, #dfe4ea); display: flex; justify-content: center; align-items: center; font-size: 18px; color: #a4b0be; border: 2px solid #fff; overflow: hidden; }
+        .member-ig { font-size: 14px; font-weight: 600; color: #2C3E50; display: flex; align-items: center; gap: 5px; }
+        .verified-icon { color: #1da1f2; font-size: 12px; }
+        .member-date { font-size: 11px; color: #95a5a6; }
+        .badge-vvip { background: rgba(255, 126, 179, 0.1); color: var(--pink-dark); padding: 4px 10px; border-radius: 12px; font-size: 10px; font-weight: 700; display: flex; align-items: center; gap: 4px; border: 1px solid rgba(255, 126, 179, 0.2); }
+        .badge-member { background: rgba(52, 152, 219, 0.1); color: #2980b9; padding: 4px 10px; border-radius: 12px; font-size: 10px; font-weight: 700; display: flex; align-items: center; gap: 4px; border: 1px solid rgba(52, 152, 219, 0.2); }
+
+        /* Floating Add Button */
+        .btn-floating-add { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #FF7EB3, #D6336C); color: #fff; padding: 12px 25px; border-radius: 25px; border: none; font-family: 'Poppins'; font-weight: 600; font-size: 14px; box-shadow: 0 8px 20px rgba(214, 51, 108, 0.3); cursor: pointer; transition: 0.3s; z-index: 10; display: flex; gap: 8px; align-items: center; }
+        .btn-floating-add:active { transform: translateX(-50%) scale(0.95); }
+
+        /* Overlay Modals Umum */
+        .modal-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); z-index: 20; display: flex; flex-direction: column; transform: translateY(100%); transition: 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .modal-overlay.open { transform: translateY(0); }
+        
+        .modal-header { padding: 25px 20px; text-align: center; position: relative; border-bottom: 1px dashed rgba(255,126,179,0.3); }
+        .modal-body { flex: 1; overflow-y: auto; padding: 20px; scrollbar-width: none; }
+        .modal-body::-webkit-scrollbar { display: none; }
+
+        /* 🌟 GATEKEEPER POP-UP (KUNCI HALAMAN) */
+        .gatekeeper-theme {
+            background: rgba(255, 240, 245, 0.98); 
+            z-index: 999; /* Paling depan menutupi semuanya */
+            display: flex; justify-content: center; align-items: center; padding: 20px;
+        }
+        .gatekeeper-card {
+            background: #fff; border: 2px dashed rgba(255,126,179,0.5); border-radius: 24px;
+            padding: 35px 25px; text-align: center; box-shadow: 0 15px 35px rgba(255, 126, 179, 0.2);
+            width: 100%; animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+        /* Form Inputs */
+        .form-group { margin-bottom: 15px; }
+        .form-label { font-size: 12px; font-weight: 600; color: #2C3E50; margin-bottom: 5px; display: block; text-align: left; }
+        .input-pro { width: 100%; padding: 12px 15px; background: #f8f9fa; border: 1px solid #dfe4ea; border-radius: 12px; font-family: 'Poppins'; outline: none; transition: 0.3s; }
+        .input-pro:focus { border-color: var(--pink-main); background: #fff; }
+        select.input-pro { appearance: none; }
+        
+        .info-autofill { background: rgba(46, 204, 113, 0.1); color: #27ae60; font-size: 11px; padding: 8px; border-radius: 8px; text-align: center; margin-bottom: 15px; border: 1px dashed #2ecc71; display: none; }
+
+        /* Tombol Aksi */
+        .btn-stack { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
+        .btn-pro { width: 100%; padding: 14px; border: none; border-radius: 14px; font-family: 'Poppins'; font-size: 14px; font-weight: 600; cursor: pointer; transition: 0.3s; display: flex; justify-content: center; align-items: center; gap: 8px; }
+        .btn-pink-gradient { background: linear-gradient(135deg, #FF7EB3, #D6336C); color: white; box-shadow: 0 6px 15px rgba(214, 51, 108, 0.25); }
+        .btn-pink-gradient:hover { transform: translateY(-2px); filter: brightness(1.05); }
+        .btn-back { background: rgba(0,0,0,0.04); color: #576574; border: 1px solid rgba(0,0,0,0.05); }
+        .btn-back:hover { background: rgba(0,0,0,0.08); }
+
+        /* ADMIN PANEL DESIGN */
+        .admin-theme { background: #fff0f5; }
+        .admin-avatar { width: 80px; height: 80px; border-radius: 50%; border: 4px solid var(--pink-main); margin: 0 auto 10px; object-fit: cover; box-shadow: 0 5px 15px rgba(255,126,179,0.4); }
+        .admin-card { background: #fff; border: 2px dashed rgba(255,126,179,0.4); border-radius: 18px; padding: 15px; margin-bottom: 15px; position: relative; }
+        .admin-data p { font-size: 12px; margin-bottom: 4px; color: #444; }
+        .admin-data b { color: var(--pink-dark); }
+        .btn-delete { position: absolute; top: 15px; right: 15px; background: #ff4757; color: #fff; border: none; width: 30px; height: 30px; border-radius: 8px; cursor: pointer; display: flex; justify-content: center; align-items: center; }
+
+        /* Gelembung Chat (Toast) */
+        .bubble-toast { position: absolute; bottom: -100px; left: 50%; transform: translateX(-50%); background: #2C3E50; color: #fff; padding: 12px 20px; border-radius: 20px 20px 20px 0; font-size: 12px; font-weight: 500; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transition: 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); z-index: 10000; text-align: center; max-width: 80%; }
+        .bubble-toast.show { bottom: 80px; }
+        .bubble-toast::after { content: ''; position: absolute; bottom: 0; left: -8px; border-width: 8px 10px 0 0; border-style: solid; border-color: #2C3E50 transparent transparent transparent; }
+
+        .exiting { animation: cinematicExit 0.5s cubic-bezier(0.5, 0, 0.2, 1) forwards; }
+        @keyframes cinematicExit { 0% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); } 100% { opacity: 0; transform: translateY(-30px) scale(0.92); filter: blur(5px); } }
+
+    </style>
+</head>
+<body>
+
+    <div class="bg-particles" id="particleEngine"></div>
+
+    <div class="master-container" id="mainFrame">
+        
+        <div class="modal-overlay gatekeeper-theme open" id="gatekeeperModal">
+            <div class="gatekeeper-card">
+                <img src="imut.jpg" class="admin-avatar" style="width: 85px; height: 85px; margin-bottom: 15px;" alt="Vyora">
+                <h2 style="font-family:'Playfair Display'; color:var(--pink-dark); margin-bottom: 5px;">Security Check 🌸</h2>
+                <p style="font-size: 12.5px; color: #555; margin-bottom: 25px; line-height: 1.5;">
+                    "hayiee, kalo mau lihat member, silahkan isi password dari admin dulu yaaw"
+                </p>
+                
+                <input type="password" id="gatePw" class="input-pro" placeholder="Masukkan password..." style="text-align: center; margin-bottom: 5px;">
+                
+                <div class="btn-stack">
+                    <button class="btn-pro btn-pink-gradient" onclick="unlockGate()"><i class="fas fa-unlock"></i> Buka Akses</button>
+                    <button class="btn-pro btn-back" onclick="exitToLobby(this)"><i class="fas fa-arrow-left"></i> Ngga tau pw nya</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="header-box">
+            <button class="btn-close" onclick="exitToLobby(this)" title="Kembali"><i class="fas fa-times"></i></button>
+            <h1 class="header-title">
+                <i class="fas fa-crown icon-admin-trigger" onclick="promptAdmin()" title="Admin Area"></i> 
+                VVIP Member
+            </h1>
+            <p class="header-subtitle">Daftar Akun Terverifikasi Wish by Vyora</p>
+            
+            <div class="search-wrapper">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="searchInput" class="search-input" placeholder="Cari username IG..." onkeyup="searchPublicList()">
+            </div>
+        </div>
+
+        <div class="member-list-container" id="publicListArea">
+            </div>
+
+        <button class="btn-floating-add" onclick="openForm()"><i class="fas fa-plus-circle"></i> Create Format</button>
+
+
+        <div class="modal-overlay" id="modalForm">
+            <div class="modal-header">
+                <button class="btn-close" onclick="closeForm()"><i class="fas fa-chevron-down"></i></button>
+                <h2 style="font-family:'Playfair Display'; color:var(--pink-dark);">Member Saluran & VVIP</h2>
+                <p style="font-size:12px; color:#7f8c8d;">Isi format dengan lengkap yaa</p>
+            </div>
+            <div class="modal-body">
+                
+                <div id="autoFillNotif" class="info-autofill">
+                    <i class="fas fa-magic"></i> Data kamu udah otomatis terisi dari pendaftaran sebelumnya!
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Nama Lengkap</label>
+                    <input type="text" id="regNama" class="input-pro" placeholder="Masukkan nama...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Umur</label>
+                    <input type="number" id="regUmur" class="input-pro" placeholder="Contoh: 18">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">No HP</label>
+                    <input type="tel" id="regHp" class="input-pro" placeholder="Contoh: 0812...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Link IG / Username</label>
+                    <input type="text" id="regIg" class="input-pro" placeholder="https://instagram.com/...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Daftar Sebagai</label>
+                    <select id="regType" class="input-pro" onchange="checkType()">
+                        <option value="member">Member Biasa</option>
+                        <option value="vvip">Member VVIP</option>
+                    </select>
+                </div>
+                <div class="form-group" id="divPwVvip" style="display: none;">
+                    <label class="form-label" style="color:#e74c3c;">Password VVIP <i class="fas fa-lock"></i></label>
+                    <input type="password" id="regPwVvip" class="input-pro" placeholder="Masukkan sandi VVIP...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" style="color:var(--pink-main);">Password Admin <i class="fas fa-key"></i></label>
+                    <input type="password" id="regPwAdmin" class="input-pro" placeholder="Kode akses format...">
+                </div>
+
+                <div class="btn-stack" style="margin-top: 10px;">
+                    <button class="btn-pro btn-pink-gradient" onclick="submitForm()"><i class="fas fa-paper-plane"></i> Create Data</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-overlay admin-theme" id="modalAdmin">
+            <div class="modal-header">
+                <button class="btn-close" onclick="closeAdmin()"><i class="fas fa-chevron-down"></i></button>
+                <img src="imut.jpg" class="admin-avatar" alt="Vyora Admin">
+                <h2 style="font-family:'Playfair Display'; color:var(--pink-dark);">Ruang Admin Vyora 🌸</h2>
+                <p style="font-size:12px; color:#555;">Semua data asli ada di sini, hapus yang spam ya!</p>
+            </div>
+            <div class="modal-body" id="adminListArea">
+                </div>
+        </div>
+
+        <div class="bubble-toast" id="bubbleMsg">Pesan Error</div>
+
+    </div>
+
+    <script>
+        // ==========================================
+        // DATABASE LOKAL (DUMMY AWAL)
+        // ==========================================
+        let dbMembers = JSON.parse(localStorage.getItem('vyoraMembers')) || [
+            { id: 171600001, nama: "Bintang Putra", umur: 20, hp: "08123456", igRaw: "bintang_p", igClean: "@bintang_p", type: "vvip", date: "24 Mei 2026" },
+            { id: 171600002, nama: "Clarissa", umur: 19, hp: "08987654", igRaw: "https://ig.com/clarissa_v", igClean: "@clarissa_v", type: "member", date: "25 Mei 2026" }
+        ];
+
+        function getTodayDate() {
+            const months = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agt","Sep","Okt","Nov","Des"];
+            let d = new Date();
+            return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+        }
+
+        function cleanIG(raw) {
+            let processed = raw.trim().replace(/\/$/, "");
+            let checkMatch = processed.match(/(?:https?:\/\/)?(?:www\.)?instagram\.com\/([a-zA-Z0-9_.]+)/i);
+            if (checkMatch && checkMatch[1]) return "@" + checkMatch[1];
+            if (!processed.startsWith("@")) return "@" + processed;
+            return processed;
+        }
+
+        // ==========================================
+        // 🌟 GATEKEEPER LOGIC (KUNCI KEAMANAN AWAL)
+        // ==========================================
+        function unlockGate() {
+            let pw = document.getElementById('gatePw').value;
+            if (pw === '123454321') {
+                document.getElementById('gatekeeperModal').classList.remove('open');
+                showBubble("Akses Diterima! Selamat datang 💕");
+                // Bersihin kolom pw nya buat estetik
+                document.getElementById('gatePw').value = ''; 
+            } else {
+                showBubble("Password salah bestie! 😝");
+            }
+        }
+
+        // ==========================================
+        // RENDERING ENGINE
+        // ==========================================
+        function renderPublic() {
+            const container = document.getElementById('publicListArea');
+            container.innerHTML = "";
+
+            if(dbMembers.length === 0) {
+                container.innerHTML = `<div style="text-align:center; color:#95a5a6; margin-top:50px;"><i class="fas fa-folder-open" style="font-size:30px;"></i><br><br>Belum ada member yang daftar.</div>`;
+                return;
+            }
+
+            dbMembers.reverse().forEach((m, index) => {
+                let badge = m.type === 'vvip' 
+                    ? `<div class="badge-vvip"><i class="fas fa-star"></i> VVIP</div>` 
+                    : `<div class="badge-member"><i class="fas fa-user"></i> Member</div>`;
+                
+                let avatarIcon = m.type === 'vvip' ? `<i class="fas fa-crown" style="color:var(--pink-main)"></i>` : `<i class="fas fa-user"></i>`;
+
+                let card = `
+                <div class="member-card public-item" style="animation-delay: ${index * 0.1}s;">
+                    <div class="member-info">
+                        <div class="member-avatar">${avatarIcon}</div>
+                        <div class="member-details">
+                            <div class="member-ig">${m.igClean} <i class="fas fa-check-circle verified-icon"></i></div>
+                            <div class="member-date">Joined: ${m.date}</div>
+                        </div>
+                    </div>
+                    ${badge}
+                </div>`;
+                container.innerHTML += card;
+            });
+            dbMembers.reverse(); 
+        }
+
+        function renderAdmin() {
+            const container = document.getElementById('adminListArea');
+            container.innerHTML = "";
+            dbMembers.reverse().forEach(m => {
+                let typeColor = m.type === 'vvip' ? 'var(--pink-dark)' : '#2980b9';
+                let card = `
+                <div class="admin-card">
+                    <button class="btn-delete" onclick="deleteData(${m.id})"><i class="fas fa-trash"></i></button>
+                    <div class="admin-data">
+                        <p><b>Nama:</b> ${m.nama}</p>
+                        <p><b>Umur:</b> ${m.umur} Tahun</p>
+                        <p><b>No HP:</b> ${m.hp}</p>
+                        <p><b>Akun IG:</b> ${m.igClean}</p>
+                        <p><b>Tipe:</b> <span style="color:${typeColor}; font-weight:700;">${m.type.toUpperCase()}</span></p>
+                        <p><b>Tgl Daftar:</b> ${m.date}</p>
+                    </div>
+                </div>`;
+                container.innerHTML += card;
+            });
+            dbMembers.reverse();
+        }
+
+        // ==========================================
+        // SMART AUTO-FILL
+        // ==========================================
+        function loadUserCache() {
+            let cacheData = JSON.parse(localStorage.getItem('vyoraUserCache'));
+            if(cacheData) {
+                document.getElementById('regNama').value = cacheData.nama || "";
+                document.getElementById('regUmur').value = cacheData.umur || "";
+                document.getElementById('regHp').value = cacheData.hp || "";
+                document.getElementById('regIg').value = cacheData.ig || "";
+                document.getElementById('autoFillNotif').style.display = 'block';
+            }
+        }
+
+        // ==========================================
+        // LOGIKA FORM REGISTRASI
+        // ==========================================
+        function openForm() { document.getElementById('modalForm').classList.add('open'); }
+        function closeForm() { document.getElementById('modalForm').classList.remove('open'); }
+        
+        function checkType() {
+            let type = document.getElementById('regType').value;
+            let divVvip = document.getElementById('divPwVvip');
+            if(type === 'vvip') { divVvip.style.display = 'block'; } 
+            else { divVvip.style.display = 'none'; document.getElementById('regPwVvip').value = ""; }
+        }
+
+        function submitForm() {
+            let nama = document.getElementById('regNama').value.trim();
+            let umur = document.getElementById('regUmur').value.trim();
+            let hp = document.getElementById('regHp').value.trim();
+            let ig = document.getElementById('regIg').value.trim();
+            let type = document.getElementById('regType').value;
+            let pwVvip = document.getElementById('regPwVvip').value;
+            let pwAdmin = document.getElementById('regPwAdmin').value;
+
+            if(!nama || !umur || !hp || !ig || !pwAdmin) {
+                showBubble("Ups! Semua format wajib di isi yaa lur 🥺"); return;
+            }
+            if(type === 'vvip' && pwVvip !== 'Vvipyora1') {
+                showBubble("Password VVIP salah! Kamu ngga bisa daftar VVIP ❌"); return;
+            }
+            if(pwAdmin !== '123454321') {
+                showBubble("Password Admin salah! Form ditolak 🛑"); return;
+            }
+
+            let userCache = { nama: nama, umur: umur, hp: hp, ig: ig };
+            localStorage.setItem('vyoraUserCache', JSON.stringify(userCache));
+
+            let newMember = {
+                id: Date.now(),
+                nama: nama, umur: umur, hp: hp, igRaw: ig,
+                igClean: cleanIG(ig), type: type, date: getTodayDate()
+            };
+
+            dbMembers.push(newMember);
+            localStorage.setItem('vyoraMembers', JSON.stringify(dbMembers));
+            
+            document.getElementById('regPwVvip').value = "";
+            document.getElementById('regPwAdmin').value = "";
+            document.getElementById('regType').value = "member";
+            checkType();
+
+            closeForm();
+            renderPublic();
+            showBubble("Yey! Data berhasil ditambahkan ke List 🎉");
+        }
+
+        // ==========================================
+        // LOGIKA ADMIN PANEL & HAPUS
+        // ==========================================
+        function promptAdmin() {
+            let pwd = prompt("Masukkan Password Khusus Admin:");
+            if(pwd === "vyora imut") {
+                document.getElementById('modalAdmin').classList.add('open');
+                renderAdmin();
+                showBubble("Selamat datang Kak Vyora! 🌸");
+            } else if(pwd !== null) {
+                showBubble("Hayo password salah! Kamu bukan Admin ya 😝");
+            }
+        }
+
+        function closeAdmin() { document.getElementById('modalAdmin').classList.remove('open'); }
+
+        function deleteData(id) {
+            if(confirm("Yakin mau hapus data ini kak?")) {
+                dbMembers = dbMembers.filter(m => m.id !== id);
+                localStorage.setItem('vyoraMembers', JSON.stringify(dbMembers));
+                renderAdmin();
+                renderPublic();
+                showBubble("Data berhasil dihapus! 🗑️");
+            }
+        }
+
+        // ==========================================
+        // FITUR TAMBAHAN
+        // ==========================================
+        function searchPublicList() {
+            let input = document.getElementById('searchInput').value.toLowerCase();
+            let cards = document.getElementsByClassName('public-item');
+            for (let i = 0; i < cards.length; i++) {
+                let ig = cards[i].querySelector('.member-ig').innerText.toLowerCase();
+                if (ig.includes(input)) { cards[i].style.display = "flex"; } 
+                else { cards[i].style.display = "none"; }
+            }
+        }
+
+        let bubbleTimer;
+        function showBubble(msg) {
+            const bubble = document.getElementById('bubbleMsg');
+            bubble.innerText = msg;
+            bubble.classList.add('show');
+            clearTimeout(bubbleTimer);
+            bubbleTimer = setTimeout(() => { bubble.classList.remove('show'); }, 3500);
+        }
+
+        function exitToLobby(btn) {
+            if(btn && btn.disabled) return;
+            if(btn) {
+                btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
+                btn.disabled = true;
+            }
+            document.getElementById('mainFrame').classList.add('exiting');
+            setTimeout(() => { window.location.assign('myOnce.html'); }, 500); 
+        }
+
+        // INIT
+        window.addEventListener('DOMContentLoaded', () => {
+            renderPublic();
+            loadUserCache();
+
+            const engine = document.getElementById('particleEngine');
+            for(let i = 0; i < 15; i++) {
+                let p = document.createElement('div');
+                p.className = 'particle'; 
+                let size = Math.random() * 15 + 5;
+                p.style.width = size + 'px'; p.style.height = size + 'px';
+                p.style.left = Math.random() * 100 + 'vw'; 
+                p.style.animationDuration = (Math.random() * 10 + 5) + 's';
+                p.style.animationDelay = Math.random() * 5 + 's'; 
+                engine.appendChild(p);
+            }
+        });
+    </script>
+</body>
+</html>

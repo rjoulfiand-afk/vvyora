@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Profile | Vyora & Dev</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Poppins:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            /* Warna Bawaan Vyora */
+            --pink-main: #FF7EB3;
+            --pink-dark: #D6336C;
+            --pinterest-red: #E60023;
+            
+            /* Tambahan Warna Dev */
+            --blue-main: #3498db;
+            --blue-dark: #2980b9;
+            --blue-glow: rgba(52, 152, 219, 0.5);
+            --meta-blue: #1877F2;
+
+            /* General & Glass */
+            --glass-white: rgba(255, 255, 255, 0.92);
+            --shadow-cute: 0 15px 35px rgba(255, 126, 179, 0.25);
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            
+            /* Background Gradient */
+            --bg-top: #ffffff;
+            --bg-bottom: #ffe4e1;
+        }
+
+        /* Perubahan Background saat Mode Dev */
+        body.dev-mode {
+            --bg-bottom: #e0f7fa; 
+            --shadow-cute: 0 15px 35px rgba(52, 152, 219, 0.25);
+        }
+
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            -webkit-tap-highlight-color: transparent; 
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+            transition: background 1s ease-in-out;
+            color: #2C3E50;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            overflow-x: hidden; 
+        }
+
+        /* Background Partikel Asli Bawaan Lu */
+        .bg-particles { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            pointer-events: none; 
+            z-index: 0; 
+        }
+        
+        .particle { 
+            position: absolute; 
+            background: rgba(255, 126, 179, 0.3); 
+            border-radius: 50%; 
+            animation: floatUp linear infinite; 
+            transition: background 1s ease;
+        }
+
+        body.dev-mode .particle {
+            background: rgba(52, 152, 219, 0.3);
+        }
+        
+        @keyframes floatUp { 
+            0% { transform: translateY(100vh) scale(0); opacity: 0; } 
+            50% { opacity: 1; } 
+            100% { transform: translateY(-10vh) scale(1); opacity: 0; } 
+        }
+
+        /* Arsitektur 3D Flip (Scene -> Wrapper -> Face) */
+        .profile-container {
+            width: 100%;
+            max-width: 440px;
+            perspective: 1500px;
+            position: relative;
+            z-index: 1;
+            animation: slideUpFade 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        @keyframes slideUpFade {
+            0% { opacity: 0; transform: translateY(50px) scale(0.95); filter: blur(5px); }
+            100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+        }
+
+        .card-3d-wrapper {
+            width: 100%;
+            display: grid;
+            transform-style: preserve-3d;
+            transition: transform 1s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            border-radius: 32px;
+        }
+
+        .card-3d-wrapper.levitate { transform: scale(1.03) translateY(-15px); }
+        .card-3d-wrapper.flipped { transform: rotateY(180deg); }
+        .card-3d-wrapper.levitate.flipped { transform: rotateY(180deg) scale(1.03) translateY(-15px); }
+
+        /* Sisi Kartu Umum */
+        .card-face {
+            grid-area: 1 / 1;
+            backface-visibility: hidden;
+            background-color: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 32px;
+            box-shadow: var(--shadow-cute);
+            padding: 35px 20px 25px;
+            position: relative;
+            overflow: hidden;
+            pointer-events: none; 
+        }
+
+        /* Hitbox kontrol 3D */
+        .card-face.front { pointer-events: auto; }
+        .card-3d-wrapper.flipped .card-face.back { pointer-events: auto; }
+        .card-3d-wrapper.flipped .card-face.front { pointer-events: none; }
+
+        /* Sisi Belakang (JulDev) */
+        .card-face.back {
+            transform: rotateY(180deg);
+            border: 1px solid rgba(52, 152, 219, 0.4);
+            box-shadow: 0 15px 35px var(--shadow-cute), 0 0 20px var(--blue-glow);
+        }
+
+        /* Tombol Aksi di Sudut Atas */
+        .btn-top-left, .btn-top-right {
+            position: absolute; top: 20px;
+            width: 38px; height: 38px; border-radius: 50%; border: none;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 16px; cursor: pointer; transition: var(--transition); z-index: 10;
+        }
+        
+        .btn-top-left { left: 20px; background: rgba(0,0,0,0.05); color: #2C3E50; }
+        .btn-top-left:hover { background: #ff4757; color: #fff; transform: rotate(90deg); }
+
+        .btn-top-right { right: 20px; background: rgba(255,255,255,0.8); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .btn-top-right:hover { transform: scale(1.1); }
+        
+        .icon-fingerprint { color: #2C3E50; animation: breathe 2s infinite; }
+        @keyframes breathe { 0%, 100% { opacity: 0.5; filter: drop-shadow(0 0 2px transparent); } 50% { opacity: 1; color: var(--blue-main); filter: drop-shadow(0 0 5px var(--blue-main)); } }
+        
+        .icon-crown { color: #f1c40f; filter: drop-shadow(0 0 5px rgba(241, 196, 15, 0.5)); animation: pulseCrown 1.5s infinite; }
+        @keyframes pulseCrown { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+
+        /* Info & Teks Profil */
+        .profile-info { text-align: center; margin-bottom: 20px; position: relative; z-index: 2; }
+        
+        .web-title { 
+            font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; 
+            margin-bottom: 2px; display: flex; align-items: center; justify-content: center; gap: 6px;
+        }
+        .title-pink { color: var(--pink-dark); }
+        .title-blue { color: var(--blue-dark); }
+
+        .verified-badge { font-size: 18px; filter: drop-shadow(0 2px 4px rgba(230,0,35,0.2)); cursor: pointer; }
+        .badge-pinterest { color: var(--pinterest-red); }
+        .badge-meta { color: var(--meta-blue); filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
+
+        .web-subtitle { 
+            font-size: 12px; font-weight: 500; letter-spacing: 0.5px; 
+            display: flex; align-items: center; justify-content: center; gap: 5px;
+        }
+        .sub-pink { color: #7f8c8d; }
+        .sub-blue { color: var(--blue-main); }
+
+        /* Premium Credential Badges (Jabatan & Gelar) */
+        .credential-tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 12px; }
+        .tag-badge { padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 5px; letter-spacing: 0.5px; }
+        .tag-pink { background: rgba(255, 126, 179, 0.08); border: 1px solid rgba(255, 126, 179, 0.3); color: var(--pink-dark); }
+        .tag-blue { background: rgba(52, 152, 219, 0.08); border: 1px solid rgba(52, 152, 219, 0.3); color: var(--blue-dark); }
+
+        /* 📸 GALLERY PREMIUM LAYOUT (+ MOUSE DRAG FIX) */
+        .gallery-wrapper { position: relative; width: 100%; margin-bottom: 25px; z-index: 2; }
+        
+        .gallery-scroller {
+            display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 12px;
+            padding-bottom: 15px; scrollbar-width: none; -ms-overflow-style: none;
+            -webkit-overflow-scrolling: touch; 
+            cursor: grab; /* 🌟 Kursor Tangan di PC */
+        }
+        
+        /* 🌟 Saat Mouse Ditahan (Dragging) */
+        .gallery-scroller.active {
+            cursor: grabbing;
+            scroll-snap-type: none; /* Matikan snap sementara biar gesernya ga nyendat */
+        }
+
+        .gallery-scroller::-webkit-scrollbar { display: none; }
+
+        .gallery-card {
+            flex: 0 0 80%; scroll-snap-align: center; aspect-ratio: 4/5;
+            border-radius: 20px; position: relative; box-shadow: 0 12px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255,255,255,0.7); overflow: hidden; background: #fff;
+            transform: translateZ(0); 
+        }
+
+        .gallery-card::after {
+            content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 35%;
+            background: linear-gradient(to top, rgba(0,0,0,0.6), transparent); z-index: 1;
+        }
+
+        /* pointer-events: none; penting banget biar gambar ngga ke-drag native oleh browser */
+        .gallery-img { width: 100%; height: 100%; object-fit: cover; z-index: 0; position: relative; pointer-events: none; }
+        
+        .gallery-counter {
+            position: absolute; bottom: 12px; right: 15px; color: #fff; font-size: 12px; 
+            font-weight: 600; letter-spacing: 1px; z-index: 2; text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            display: flex; align-items: center; gap: 6px;
+        }
+
+        .gallery-logo-pin {
+            position: absolute; top: 12px; right: 15px; color: rgba(255,255,255,0.9); 
+            font-size: 20px; z-index: 2; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+
+        /* Bio Boxes */
+        .bio-box {
+            padding: 18px; border-radius: 18px; font-size: 12.5px;
+            margin-bottom: 20px; line-height: 1.6; text-align: center;
+        }
+        .bio-pink { background: rgba(255, 182, 193, 0.15); border: 1px solid rgba(255, 126, 179, 0.2); color: #555; }
+        
+        /* Terminal Bio Hacker (Dev) */
+        .bio-blue { 
+            background: rgba(15, 32, 39, 0.05); border: 1px solid rgba(52, 152, 219, 0.3); color: #2C3E50; 
+            font-family: 'JetBrains Mono', monospace; text-align: left; position: relative;
+        }
+        .cursor-blink { 
+            display: inline-block; width: 8px; height: 15px; background-color: var(--blue-main); 
+            margin-left: 2px; animation: blink 1s step-end infinite; vertical-align: middle; 
+        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* Tombol Aksi */
+        .btn-stack { display: flex; flex-direction: column; gap: 10px; z-index: 2; position: relative; }
+        
+        .btn-pro {
+            width: 100%; padding: 14px; border: none; border-radius: 14px;
+            font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600;
+            cursor: pointer; transition: var(--transition); display: flex; justify-content: center; align-items: center; gap: 8px;
+        }
+        
+        .btn-pink-gradient { background: linear-gradient(135deg, #FF7EB3, #D6336C); color: white; box-shadow: 0 6px 15px rgba(214, 51, 108, 0.25); }
+        .btn-pink-gradient:hover { transform: translateY(-2px); filter: brightness(1.05); }
+
+        .btn-blue-gradient { background: linear-gradient(135deg, #3498db, #2980b9); color: white; box-shadow: 0 6px 15px rgba(52, 152, 219, 0.25); }
+        .btn-blue-gradient:hover { transform: translateY(-2px); filter: brightness(1.05); }
+
+        .btn-back { background: rgba(0,0,0,0.04); color: #576574; border: 1px solid rgba(0,0,0,0.05); }
+        .btn-back:hover { background: rgba(0,0,0,0.08); }
+
+        /* Hint & Animasi Keluar */
+        .swipe-hint {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            color: #95a5a6; font-size: 11px; font-weight: 500; margin-bottom: 12px;
+            animation: swipeHand 2s infinite; z-index: 2; position: relative;
+        }
+        @keyframes swipeHand { 0%, 100% { transform: translateX(0); opacity: 0.5; } 50% { transform: translateX(-10px); opacity: 1; } }
+
+        .exiting { animation: cinematicExit 0.5s cubic-bezier(0.5, 0, 0.2, 1) forwards; }
+        @keyframes cinematicExit {
+            0% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+            100% { opacity: 0; transform: translateY(-30px) scale(0.92); filter: blur(5px); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="bg-particles" id="particleEngine"></div>
+
+    <div class="profile-container" id="mainFrame">
+        <div class="card-3d-wrapper" id="flipCard">
+            
+            <div class="card-face front">
+                
+                <button class="btn-top-left" onclick="exitToLobby(this)" title="Kembali ke Lobi"><i class="fas fa-times"></i></button>
+                <button class="btn-top-right" onclick="executeFlipToDev()" title="System Override"><i class="fas fa-fingerprint icon-fingerprint"></i></button>
+
+                <div class="profile-info">
+                    <h1 class="web-title title-pink">
+                        Vyoraa 
+                        <i class="fas fa-check-circle verified-badge badge-pinterest" title="Official Pinterest Creator"></i>
+                    </h1>
+                    <p class="web-subtitle sub-pink">
+                        <i class="fab fa-pinterest" style="color: var(--pinterest-red);"></i> Official Pinterest Creator
+                    </p>
+                    
+                    <div class="credential-tags">
+                        <div class="tag-badge tag-pink"><i class="fas fa-graduation-cap"></i> Swiss Alumni</div>
+                        <div class="tag-badge tag-pink"><i class="fas fa-chart-pie"></i> Statistics Manager</div>
+                        <div class="tag-badge tag-pink"><i class="fas fa-language"></i> EN & ZH Teacher</div>
+                        <div class="tag-badge tag-pink"><i class="fas fa-camera-retro"></i> Fashion Model</div>
+                    </div>
+                </div>
+
+                <div class="swipe-hint"><i class="fas fa-hand-pointer"></i> Geser foto atau Tap Sidik Jari</div>
+                
+                <div class="gallery-wrapper">
+                    <div class="gallery-scroller">
+                        <div class="gallery-card"><i class="fab fa-pinterest gallery-logo-pin"></i><img src="uw.jpg" class="gallery-img" alt="Vyora 1"><div class="gallery-counter">1 / 22</div></div>
+                        <div class="gallery-card"><i class="fab fa-pinterest gallery-logo-pin"></i><img src="vyoo1.jpg" class="gallery-img" alt="Vyora 2"><div class="gallery-counter">2 / 22</div></div>
+                        <div class="gallery-card"><img src="vyoo5.jpg" class="gallery-img" alt="Vyora 3"><div class="gallery-counter">3 / 22</div></div>
+                        <div class="gallery-card"><img src="vyoo9.jpg" class="gallery-img" alt="Vyora 4"><div class="gallery-counter">4 / 22</div></div>
+                        <div class="gallery-card"><img src="vketi.jpg" class="gallery-img" alt="Vyora 5"><div class="gallery-counter">5 / 22</div></div>
+                        <div class="gallery-card"><img src="vyoo10.jpg" class="gallery-img" alt="Vyora 6"><div class="gallery-counter">6 / 22</div></div>
+                        <div class="gallery-card"><img src="saluran.jpg" class="gallery-img" alt="Vyora 7"><div class="gallery-counter">7 / 22</div></div>
+                        <div class="gallery-card"><img src="preview.jpg" class="gallery-img" alt="Vyora 8"><div class="gallery-counter">8 / 22</div></div>
+                        <div class="gallery-card"><img src="vip.jpg" class="gallery-img" alt="Vyora 9"><div class="gallery-counter">9 / 22</div></div>
+                        <div class="gallery-card"><img src="vyoo4.jpg" class="gallery-img" alt="Vyora 10"><div class="gallery-counter">10 / 22</div></div>
+                        <div class="gallery-card"><img src="vyoo11.jpg" class="gallery-img" alt="Vyora 11"><div class="gallery-counter">11 / 22</div></div>
+                        <div class="gallery-card"><img src="vyo12.jpg" class="gallery-img" alt="Vyora 12"><div class="gallery-counter">12 / 22</div></div>
+                        <div class="gallery-card"><img src="vyoo8.jpg" class="gallery-img" alt="Vyora 13"><div class="gallery-counter">13 / 22</div></div>
+                        <div class="gallery-card"><img src="vyoraa.jpg" class="gallery-img" alt="Vyora 14"><div class="gallery-counter">14 / 22</div></div>
+                        <div class="gallery-card"><img src="vyo16.jpg" class="gallery-img" alt="Vyora 15"><div class="gallery-counter">15 / 22</div></div>
+                        <div class="gallery-card"><img src="vyoo6.jpg" class="gallery-img" alt="Vyora 16"><div class="gallery-counter">16 / 22</div></div>
+                        <div class="gallery-card"><img src="vyoo7.jpg" class="gallery-img" alt="Vyora 17"><div class="gallery-counter">17 / 22</div></div>
+                        <div class="gallery-card"><img src="vyo13.jpg" class="gallery-img" alt="Vyora 18"><div class="gallery-counter">18 / 22</div></div>
+                        <div class="gallery-card"><img src="vyoo2.jpg" class="gallery-img" alt="Vyora 19"><div class="gallery-counter">19 / 22</div></div>
+                        <div class="gallery-card"><img src="vyo21.jpg" class="gallery-img" alt="Vyora 20"><div class="gallery-counter">20 / 22</div></div>
+                        <div class="gallery-card"><img src="vyo14.jpg" class="gallery-img" alt="Vyora 21"><div class="gallery-counter">21 / 22</div></div>
+                        <div class="gallery-card"><img src="vyo15.jpg" class="gallery-img" alt="Vyora 22"><div class="gallery-counter"><i class="fas fa-heart" style="color:var(--pink-main);"></i> 22 / 22</div></div>
+                    </div>
+                </div>
+
+                <div class="profile-info" style="margin-bottom:0;">
+                    <div class="bio-box bio-pink">
+                        "Haii semuanya! kenalin aku Viona Olivcia Vyora, umur aku 21 tahun, aku lulusan <i>Universitas ELB</i> di swiss, aku kerja di perusahaan bidang statistika dan sebagai <i>model fashion photoshoot</i>, aku juga owner dari WISH ini. Buat yang masih ragu, ini <i>real</i> foto aku yaa, kalau kalian ngira ini foto dari pinterest, kalian bisa cek kalau itu memang murni foto ku yang udah dapat verifikasi dari pihak pinterest guyss. owkiee tencuuu <i>Enjoy the benefits!</i>"
+                    </div>
+
+                    <div class="btn-stack">
+                        <button type="button" class="btn-pro btn-pink-gradient" onclick="window.open('https://www.instagram.com/olivvcyaa?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==', '_blank')">
+                            <i class="fab fa-instagram" style="font-size:20px;"></i> Follow @olivvcyaa
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-face back">
+                
+                <button class="btn-top-left" onclick="exitToLobby(this)" title="Kembali ke Lobi"><i class="fas fa-times"></i></button>
+                <button class="btn-top-right" onclick="executeFlipToAdmin()" title="Admin Vyora"><i class="fas fa-crown icon-crown"></i></button>
+
+                <div class="profile-info">
+                    <h1 class="web-title title-blue">
+                        JulDev 
+                        <i class="fas fa-check-circle verified-badge badge-meta" title="Meta Verified"></i>
+                    </h1>
+                    <p class="web-subtitle sub-blue">
+                        <i class="fas fa-code"></i> Official Web Developer
+                    </p>
+                    
+                    <div class="credential-tags">
+                        <div class="tag-badge tag-blue"><i class="fas fa-shield-alt"></i> Verified Developer</div>
+                        <div class="tag-badge tag-blue"><i class="fas fa-laptop-code"></i> UI/UX Designer</div>
+                        <div class="tag-badge tag-blue"><i class="fas fa-database"></i> Backend System</div>
+                    </div>
+                </div>
+
+                <div class="gallery-wrapper">
+                    <div class="gallery-scroller">
+                        <div class="gallery-card">
+                            <i class="fas fa-code gallery-logo-pin" style="color:rgba(255,255,255,0.7);"></i>
+                            <img src="jull.jpg" class="gallery-img" alt="JulDev 1">
+                            <div class="gallery-counter">1 / 2</div>
+                        </div>
+                        <div class="gallery-card">
+                            <img src="jhaa.jpg" class="gallery-img" alt="JulDev 2">
+                            <div class="gallery-counter"><i class="fas fa-laptop-code" style="color:var(--blue-main);"></i> 2 / 2</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-info" style="margin-bottom:0;">
+                    <div class="bio-box bio-blue">
+                        <span style="color:var(--blue-main);">root@juldev:~$</span> ./load_bio.sh<br><br>
+                        <span id="devTerminalText"></span><span class="cursor-blink"></span>
+                    </div>
+
+                    <div class="btn-stack">
+                        <button type="button" class="btn-pro btn-blue-gradient" onclick="window.open('https://www.instagram.com/rixsanjoulfiann?igsh=MWdibmlsaHR6aDJ6bw==', '_blank')">
+                            <i class="fab fa-instagram" style="font-size:20px;"></i> Follow @rixsanjoulfiann
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div> </div>
+
+    <script>
+        // ==========================================
+        // 🌸 PARTIKEL BAWAAN ASLI LU (TIDAK DIPOTONG)
+        // ==========================================
+        window.addEventListener('DOMContentLoaded', () => {
+            const engine = document.getElementById('particleEngine');
+            for(let i = 0; i < 15; i++) {
+                let p = document.createElement('div');
+                p.className = 'particle'; 
+                let size = Math.random() * 15 + 5;
+                p.style.width = size + 'px'; 
+                p.style.height = size + 'px';
+                p.style.left = Math.random() * 100 + 'vw'; 
+                p.style.animationDuration = (Math.random() * 10 + 5) + 's';
+                p.style.animationDelay = Math.random() * 5 + 's'; 
+                engine.appendChild(p);
+            }
+        });
+
+        // ==========================================
+        // 💻 EFEK TERMINAL KETIK (DEV BIO)
+        // ==========================================
+        const rawBioText = "ini adalah kak jull, developer yang bantu bikinin aku web nya guyss, dia juga yang bantuin aku untuk mengembangkan wish punya ku iniii, tencuu kaa jull, jangan lupa difollow follow akun ig nyaa guyss, dan kalau kalian mau bikin web kaya aku ginii, bisa langsung chat atau dm kak jull nyaa yaa";
+        let typeIndex = 0;
+        let isTyping = false;
+
+        function startHackerTyping() {
+            const terminal = document.getElementById('devTerminalText');
+            if (isTyping) return; 
+            
+            terminal.innerHTML = ""; 
+            typeIndex = 0;
+            isTyping = true;
+
+            function typeWriter() {
+                if (typeIndex < rawBioText.length) {
+                    terminal.innerHTML += rawBioText.charAt(typeIndex);
+                    typeIndex++;
+                    setTimeout(typeWriter, 25); 
+                } else {
+                    isTyping = false;
+                }
+            }
+            setTimeout(typeWriter, 500); 
+        }
+
+        // ==========================================
+        // 🛸 THE CYBER-GLASS 3D OVERRIDE LOGIC
+        // ==========================================
+        const flipCard = document.getElementById('flipCard');
+
+        function executeFlipToDev() {
+            flipCard.classList.add('levitate');
+            document.body.classList.add('dev-mode'); 
+            
+            setTimeout(() => {
+                flipCard.classList.add('flipped');
+                startHackerTyping(); 
+            }, 300);
+
+            setTimeout(() => {
+                flipCard.classList.remove('levitate');
+            }, 1000);
+        }
+
+        function executeFlipToAdmin() {
+            flipCard.classList.add('levitate');
+            document.body.classList.remove('dev-mode'); 
+            
+            setTimeout(() => {
+                flipCard.classList.remove('flipped');
+            }, 300);
+
+            setTimeout(() => {
+                flipCard.classList.remove('levitate');
+            }, 1000);
+        }
+
+        // ==========================================
+        // 🚪 ANIMASI KELUAR KE LOBI
+        // ==========================================
+        function exitToLobby(btn) {
+            if(btn.disabled) return;
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin" style="font-size:14px;"></i>`;
+            btn.disabled = true;
+
+            const masterFrame = document.getElementById('mainFrame');
+            masterFrame.classList.add('exiting');
+
+            setTimeout(() => {
+                window.location.assign('myOnce.html'); 
+                setTimeout(() => { btn.innerHTML = originalHtml; btn.disabled = false; }, 100);
+            }, 500); 
+        }
+
+        // ==========================================
+        // 🖱️ ENGINE MOUSE DRAG & SCROLL (BUAT PC/LAPTOP)
+        // ==========================================
+        const scrollers = document.querySelectorAll('.gallery-scroller');
+        scrollers.forEach(scroller => {
+            let isDown = false;
+            let startX;
+            let scrollLeft;
+
+            scroller.addEventListener('mousedown', (e) => {
+                isDown = true;
+                scroller.classList.add('active'); // Ubah kursor jadi nge-grab
+                startX = e.pageX - scroller.offsetLeft;
+                scrollLeft = scroller.scrollLeft;
+            });
+
+            scroller.addEventListener('mouseleave', () => {
+                isDown = false;
+                scroller.classList.remove('active');
+            });
+
+            scroller.addEventListener('mouseup', () => {
+                isDown = false;
+                scroller.classList.remove('active');
+            });
+
+            scroller.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                e.preventDefault(); // Mencegah teks ke-blok atau gambar terseret bawaan browser
+                const x = e.pageX - scroller.offsetLeft;
+                const walk = (x - startX) * 1.5; // Angka 1.5 biar gesernya lebih responsif
+                scroller.scrollLeft = scrollLeft - walk;
+            });
+        });
+    </script>
+</body>
+</html>

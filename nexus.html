@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nexus Connect 🌸</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --pink-main: #FF7EB3; --pink-dark: #D6336C; --pink-soft: #FFF0F5;
+            --glass-bg: rgba(255, 255, 255, 0.95);
+            --shadow-cute: 0 15px 40px rgba(214, 51, 108, 0.15);
+            --transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: linear-gradient(135deg, #ffffff 0%, #FFE4E1 100%); color: #333; min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 15px; overflow: hidden; }
+
+        /* MASTER CONTAINER */
+        .master-container { width: 100%; max-width: 440px; height: 90vh; max-height: 850px; background: var(--glass-bg); backdrop-filter: blur(25px); border: 2px solid #fff; border-radius: 35px; box-shadow: var(--shadow-cute); position: relative; z-index: 1; overflow: hidden; display: flex; flex-direction: column; transition: filter 0.4s; }
+        .master-container.blurred { filter: blur(6px) brightness(0.95); }
+
+        /* LOGIN SCREEN */
+        .auth-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.98); z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 35px; transition: 0.6s ease; }
+        .auth-screen.hidden { transform: translateY(-100%); opacity: 0; }
+        .auth-logo { font-size: 55px; color: var(--pink-main); margin-bottom: 15px; filter: drop-shadow(0 5px 15px rgba(255,126,179,0.3)); }
+        .auth-title { font-family: 'Fredoka', sans-serif; font-size: 30px; color: var(--pink-dark); margin-bottom: 30px; font-weight: 600; }
+        .input-cute { width: 100%; padding: 16px; background: #fff; border: 2px solid #FFE4E1; border-radius: 20px; font-size: 14px; margin-bottom: 15px; outline: none; transition: 0.3s; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02); }
+        .input-cute:focus { border-color: var(--pink-main); box-shadow: 0 5px 15px rgba(255,126,179,0.1); }
+        .btn-cute { width: 100%; padding: 16px; background: linear-gradient(135deg, var(--pink-main), var(--pink-dark)); border: none; border-radius: 20px; color: #fff; font-weight: 600; cursor: pointer; box-shadow: 0 10px 20px rgba(214,51,108,0.3); transition: 0.2s; }
+        .btn-cute:active { transform: scale(0.95); }
+
+        /* DASHBOARD & CHAT */
+        .dashboard-screen { flex: 1; display: flex; flex-direction: column; padding: 20px; opacity: 0; transition: 0.8s; }
+        .dashboard-screen.visible { opacity: 1; }
+        .chat-header { padding: 15px; background: #fff; border: 2px solid #FFE4E1; border-radius: 22px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.02); }
+        .chat-target-info { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+        .chat-target-avatar { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid var(--pink-main); padding: 2px; }
+        .chat-target-name { font-family: 'Fredoka'; font-size: 18px; font-weight: 600; color: var(--pink-dark); }
+        .chat-target-status { font-size: 11px; color: #2ecc71; font-weight: 500; }
+        
+        .chat-box { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; padding-bottom: 10px; scrollbar-width: none; }
+        .chat-box::-webkit-scrollbar { display: none; }
+        
+        /* LOGIKA RATA KANAN KIRI (BENAR: USER KANAN, ADMIN KIRI) */
+        .msg-row { display: flex; flex-direction: column; max-width: 80%; animation: popIn 0.3s forwards; }
+        @keyframes popIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .msg-row.user { align-self: flex-end; align-items: flex-end; } /* USER KANAN */
+        .msg-row.admin { align-self: flex-start; align-items: flex-start; } /* ADMIN KIRI */
+        
+        .msg-bubble { padding: 12px 18px; border-radius: 20px; font-size: 13.5px; line-height: 1.5; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
+        .msg-row.user .msg-bubble { background: linear-gradient(135deg, var(--pink-main), var(--pink-dark)); color: #fff; border-bottom-right-radius: 4px; }
+        .msg-row.admin .msg-bubble { background: #fff; border: 1px solid #FFE4E1; color: #2C3E50; border-bottom-left-radius: 4px; }
+        .msg-sender { font-size: 10px; opacity: 0.6; margin-bottom: 4px; font-weight: 600; }
+
+        .chat-input-area { background: #fff; display: flex; gap: 10px; align-items: center; margin-top: 10px; padding: 10px; border-radius: 25px; border: 2px solid #FFE4E1; box-shadow: 0 5px 15px rgba(0,0,0,0.02); }
+        .chat-input { flex: 1; background: transparent; border: none; padding: 8px 10px; font-size: 13.5px; outline: none; }
+        .btn-send { background: var(--pink-main); color: #fff; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; box-shadow: 0 5px 10px rgba(214,51,108,0.2); transition: 0.2s; }
+        .btn-send:hover { transform: scale(1.1); }
+
+        /* ========================================= */
+        /* 1. WIDGET MELAYANG (NGGA NGAGETIN) */
+        /* ========================================= */
+        .floating-widget { position: absolute; bottom: 80px; right: 20px; z-index: 40; background: rgba(255,255,255,0.95); border: 2px solid var(--pink-main); padding: 10px 15px; border-radius: 30px; box-shadow: 0 10px 20px rgba(214,51,108,0.3); display: flex; align-items: center; gap: 8px; cursor: pointer; transform: scale(0); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .floating-widget.show { transform: scale(1); animation: floatHover 3s infinite alternate; }
+        @keyframes floatHover { from { transform: translateY(0); } to { transform: translateY(-10px); } }
+        .fw-icon { font-size: 20px; animation: heartbeat 1.2s infinite; }
+        @keyframes heartbeat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+        .fw-text { font-family: 'Fredoka'; font-size: 14px; font-weight: 600; color: var(--pink-dark); }
+
+        /* ========================================= */
+        /* 2. OVERLAY GELAP & FORM TICKET */
+        /* ========================================= */
+        .overlay-dim { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); z-index: 50; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: 0.4s; }
+        .overlay-dim.show-modal { opacity: 1; pointer-events: auto; }
+        
+        .modal-box { width: 90%; max-width: 380px; background: #fff; border-radius: 30px; padding: 30px 25px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); transform: scale(0.9); opacity: 0; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; }
+        .overlay-dim.show-modal .modal-box { transform: scale(1); opacity: 1; }
+        
+        .modal-greet { font-family: 'Fredoka'; font-size: 18px; color: var(--pink-dark); text-align: center; margin-bottom: 20px; line-height: 1.4; }
+        .cute-form-input { width: 100%; padding: 14px; background: #f8f9fa; border: 2px dashed #FFE4E1; border-radius: 15px; margin-bottom: 12px; font-size: 13px; outline: none; transition: 0.3s; }
+        .cute-form-input:focus { border-color: var(--pink-main); background: #fff; }
+        
+        /* TICKET PREVIEW */
+        .cute-ticket { background: #fff; border: 2px dashed var(--pink-main); border-radius: 15px; padding: 25px 20px; position: relative; margin-bottom: 20px; display: none; }
+        .cute-ticket::before, .cute-ticket::after { content: ''; position: absolute; top: 50%; width: 25px; height: 25px; background: rgba(0,0,0,0.5); border-radius: 50%; transform: translateY(-50%); }
+        .cute-ticket::before { left: -15px; } .cute-ticket::after { right: -15px; }
+        .ribbon { position: absolute; top: -15px; left: -10px; background: var(--pink-dark); color: #fff; padding: 5px 20px; font-family: 'Fredoka'; font-size: 12px; transform: rotate(-10deg); border-radius: 8px; box-shadow: 0 5px 10px rgba(214,51,108,0.3); z-index: 2; }
+        .ticket-content { font-family: 'Fredoka'; font-size: 14px; color: #555; line-height: 1.8; text-align: left; }
+        
+        .btn-social-group { display: flex; gap: 10px; display: none; }
+        .btn-wa { flex: 1; padding: 14px; background: #25D366; color: #fff; border: none; border-radius: 15px; font-weight: 600; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 5px 15px rgba(37,211,102,0.3); }
+        .btn-ig { flex: 1; padding: 14px; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: #fff; border: none; border-radius: 15px; font-weight: 600; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 5px 15px rgba(204,35,102,0.3); }
+
+        /* ========================================= */
+        /* 3. iOS PROFILE MODAL (VYORA) */
+        /* ========================================= */
+        .profile-modal { position: absolute; bottom: 0; left: 0; width: 100%; height: 80%; background: rgba(255,255,255,0.95); backdrop-filter: blur(25px); border-radius: 35px 35px 0 0; z-index: 100; transform: translateY(100%); transition: 0.5s cubic-bezier(0.22, 1, 0.36, 1); box-shadow: 0 -10px 40px rgba(0,0,0,0.1); display: flex; flex-direction: column; padding: 15px 25px 25px; border-top: 2px solid #fff; }
+        .profile-modal.open { transform: translateY(0); }
+        .drag-handle { width: 45px; height: 5px; background: #ddd; border-radius: 10px; margin: 0 auto 20px; }
+        .btn-close-prof { position: absolute; top: 15px; right: 20px; background: #f1f2f6; width: 32px; height: 32px; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: #555; border: none; cursor: pointer; transition: 0.2s; }
+        .btn-close-prof:hover { background: #ff4757; color: #fff; }
+        
+        .prof-header { text-align: center; margin-bottom: 25px; }
+        .prof-img { width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 4px solid #fff; box-shadow: 0 10px 25px rgba(214,51,108,0.2); margin-bottom: 12px; padding: 3px; background: linear-gradient(135deg, var(--pink-main), var(--pink-dark)); }
+        .prof-name { font-family: 'Fredoka'; font-size: 24px; color: #333; display: flex; justify-content: center; align-items: center; gap: 6px; }
+        .prof-bio { font-size: 13px; color: #888; padding: 0 20px; margin-top: 5px; }
+        
+        .photo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; overflow-y: auto; padding-bottom: 20px; scrollbar-width: none; }
+        .photo-grid::-webkit-scrollbar { display: none; }
+        .grid-img { width: 100%; height: 160px; object-fit: cover; border-radius: 18px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); background: #eee; }
+
+    </style>
+</head>
+<body>
+
+    <div class="overlay-dim" id="mainOverlay">
+        <div class="modal-box" id="cardForm">
+            <div class="modal-greet" id="greetText">Hayiii benefit <b>-</b> udaa ready nih dari kak vyoraa, isi format dulu yaa 💕</div>
+            
+            <div id="formSection">
+                <input type="text" id="formNama" class="cute-form-input" placeholder="Nama Panggilan Kamu...">
+                <input type="text" id="formIg" class="cute-form-input" placeholder="Link/Username IG Kamu...">
+                <input type="number" id="formWa" class="cute-form-input" placeholder="No. WA Aktif (08...)">
+                <button class="btn-cute" onclick="generateTicket()">Buat Tiket Preview ✨</button>
+            </div>
+
+            <div class="cute-ticket" id="ticketSection">
+                <div class="ribbon">VVIP TICKET 🎀</div>
+                <div class="ticket-content" id="ticketContentText"></div>
+            </div>
+
+            <div class="btn-social-group" id="socialBtnGroup">
+                <button class="btn-wa" onclick="sendToSosmed('wa')"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+                <button class="btn-ig" onclick="sendToSosmed('ig')"><i class="fab fa-instagram"></i> Instagram</button>
+            </div>
+            <button style="width:100%; background:transparent; border:none; margin-top:20px; color:#aaa; font-size:12px; font-weight:600; cursor:pointer;" onclick="closeOverlay()">Nanti Saja (Tutup)</button>
+        </div>
+    </div>
+
+    <div class="master-container" id="mainFrame">
+        
+        <div class="floating-widget" id="floatingWidget" onclick="openFormKlaim()">
+            <div class="fw-icon">❤️</div>
+            <div class="fw-text">Benefit Ready!</div>
+        </div>
+
+        <div class="auth-screen" id="authScreen">
+            <i class="fas fa-heart auth-logo"></i>
+            <h1 class="auth-title">Nexus Connect</h1>
+            <input type="text" id="loginUsername" class="input-cute" placeholder="Username IG Kamu..." autocomplete="off">
+            <input type="password" id="loginPassword" class="input-cute" placeholder="Kode Masuk..." autocomplete="off">
+            <button class="btn-cute" onclick="processLogin()">Masuk ke Ruang Chat 💕</button>
+            <button style="background:transparent; border:none; margin-top:20px; color:#aaa; font-size:12px; cursor:pointer;" onclick="window.location.assign('myOnce.html')">Kembali ke Lobi Utama</button>
+        </div>
+
+        <div class="dashboard-screen" id="dashboardScreen">
+            <div class="chat-header">
+                <div class="chat-target-info" onclick="openAdminProfile()">
+                    <img src="imut.jpg" class="chat-target-avatar" onerror="this.src='https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'">
+                    <div>
+                        <div class="chat-target-name">Kak Vyora 🌸</div>
+                        <div class="chat-target-status">Online sekarang</div>
+                    </div>
+                </div>
+                <button class="btn-exit" onclick="window.location.assign('myOnce.html')"><i class="fas fa-door-open"></i></button>
+            </div>
+
+            <div class="chat-box" id="chatBox"></div>
+
+            <div class="chat-input-area">
+                <input type="text" id="chatInput" class="chat-input" placeholder="Ketik pesan..." onkeypress="handleEnter(event)">
+                <button class="btn-send" onclick="sendMsg()"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+
+        <div class="profile-modal" id="adminProfileModal">
+            <div class="drag-handle"></div>
+            <button class="btn-close-prof" onclick="closeAdminProfile()"><i class="fas fa-times"></i></button>
+            
+            <div class="prof-header">
+                <img src="imut.jpg" class="prof-img" onerror="this.src='https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'">
+                <div class="prof-name">Vyora <i class="fas fa-check-circle" style="color:#1DA1F2; font-size:18px;"></i></div>
+                <div class="prof-bio">Owner Member Wish  ✨ | Owner Vvip Wish 🌸</div>
+            </div>
+
+            <h4 style="font-family:'Fredoka'; font-size:16px; margin-bottom:12px; color:var(--pink-dark);">Galeri Foto</h4>
+            <div class="photo-grid">
+                <img src="vyo13.jpg" class="grid-img" onerror="this.src='https://images.unsplash.com/photo-1517841905240-472988babdf9?w=500&auto=format&fit=crop&q=80'">
+                <img src="vyo21.jpg" class="grid-img">
+                <img src="vyoo6.jpg" class="grid-img">
+                <img src="vyo14.jpg" class="grid-img">
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBbuAkyL3pyvpNWG9u3EyPyhdQn4y7blkc",
+            authDomain: "juldev-command-center.firebaseapp.com",
+            databaseURL: "https://juldev-command-center-default-rtdb.firebaseio.com",
+            projectId: "juldev-command-center",
+            storageBucket: "juldev-command-center.firebasestorage.app",
+            messagingSenderId: "859594134847",
+            appId: "1:859594134847:web:83a11af82db0095bd22f8a"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        let activeUser = "";
+        let currentBenefitText = ""; 
+        let lastBenefitId = localStorage.getItem('lastClaimedBenefit') || null;
+
+        // ==========================================
+        // 🔒 LOGIN & LISTENER FIREBASE
+        // ==========================================
+        function processLogin() {
+            const inputUser = document.getElementById('loginUsername').value.trim();
+            const pass = document.getElementById('loginPassword').value.trim();
+
+            if(inputUser === "" || pass === "") { alert("Isi form nya ya kak!"); return; }
+            if(pass !== "123454321") { alert("Sandi salah!"); return; }
+
+            activeUser = inputUser.replace(/[.#$\[\]]/g, '_');
+            
+            document.getElementById('authScreen').classList.add('hidden');
+            document.getElementById('dashboardScreen').classList.add('visible');
+
+            db.ref('users/' + activeUser).set({ online: true, lastSeen: Date.now() });
+            db.ref('users/' + activeUser).onDisconnect().set({ online: false }); 
+
+            // Pantau Tembakan Benefit dari Panel Admin
+            db.ref('status').on('value', snap => {
+                const data = snap.val() || {};
+                const isReady = data.isReady || false;
+                
+                if(isReady && data.id != lastBenefitId) {
+                    currentBenefitText = data.benefitText;
+                    // Munculin WIDGET Melayang, BUKAN overlay langsung!
+                    document.getElementById('floatingWidget').classList.add('show');
+                } else {
+                    document.getElementById('floatingWidget').classList.remove('show');
+                }
+            });
+
+            db.ref('chats/' + activeUser).on('child_added', snap => {
+                renderMessage(snap.val());
+            });
+        }
+
+        // ==========================================
+        // 🎭 ANIMASI & LOGIKA POP-UP
+        // ==========================================
+        function openFormKlaim() {
+            // Sembunyiin Widget, Munculin Overlay Form
+            document.getElementById('floatingWidget').classList.remove('show');
+            document.getElementById('mainOverlay').classList.add('show-modal');
+            document.getElementById('mainFrame').classList.add('blurred');
+            
+            document.getElementById('greetText').innerHTML = `Hayiii benefit <b style="color:#FF7EB3;">${currentBenefitText}</b> udaa ready nih dari kak vyoraa, silahkan isi format dulu yaa 💕`;
+            document.getElementById('formIg').value = document.getElementById('loginUsername').value;
+        }
+
+        function generateTicket() {
+            const nama = document.getElementById('formNama').value.trim();
+            const ig = document.getElementById('formIg').value.trim();
+            const wa = document.getElementById('formWa').value.trim();
+
+            if(nama === "" || ig === "" || wa === "") { alert("Lengkapi data dulu yaa!"); return; }
+
+            document.getElementById('formSection').style.display = 'none';
+            document.getElementById('ticketSection').style.display = 'block';
+            document.getElementById('socialBtnGroup').style.display = 'flex';
+            document.getElementById('greetText').innerText = "Wihh tiketnya udah jadi! Mau dikirim kemana nih? ✨";
+
+            document.getElementById('ticketContentText').innerHTML = `
+                Nama: <b>${nama}</b><br>
+                Link/IG: <b>@${ig}</b><br>
+                No WA: <b>${wa}</b><br>
+                Benefit: <b style="color:#D6336C;">${currentBenefitText}</b>
+            `;
+        }
+
+        function sendToSosmed(platform) {
+            const nama = document.getElementById('formNama').value;
+            const ig = document.getElementById('formIg').value;
+            const wa = document.getElementById('formWa').value;
+            
+            const pesanRaw = `Hayiii Kak Vyoraa 💕\nAku mau konfirmasi benefit nih:\n\nNama: ${nama}\nIG: @${ig}\nWA: ${wa}\nBenefit: *${currentBenefitText}*\n\nMakasih kak! ✨`;
+            const pesan = encodeURIComponent(pesanRaw);
+
+            const NO_WA_VYORA = "6281234567890"; 
+            const IG_VYORA = "vyora.official"; 
+
+            if(platform === 'wa') {
+                window.open(`https://wa.me/${NO_WA_VYORA}?text=${pesan}`, '_blank');
+            } else if(platform === 'ig') {
+                alert("Teks format sudah disiapkan! Silakan copas/kirim manual di DM Instagram ya kak 💕");
+                window.open(`https://instagram.com/${IG_VYORA}`, '_blank');
+            }
+
+            db.ref('status').once('value').then(snap => {
+                lastBenefitId = snap.val().id;
+                localStorage.setItem('lastClaimedBenefit', lastBenefitId);
+            });
+
+            db.ref('chats/' + activeUser).push({ sender: 'user', text: `✨ Aku udah kirim format klaim ${currentBenefitText} ke ${platform.toUpperCase()} kakak ya!`, timestamp: Date.now() });
+            closeOverlay();
+        }
+
+        function closeOverlay() {
+            document.getElementById('mainOverlay').classList.remove('show-modal');
+            document.getElementById('mainFrame').classList.remove('blurred');
+            
+            setTimeout(() => {
+                document.getElementById('formSection').style.display = 'block';
+                document.getElementById('ticketSection').style.display = 'none';
+                document.getElementById('socialBtnGroup').style.display = 'none';
+            }, 500);
+        }
+
+        // ==========================================
+        // 📱 ANIMASI iOS PROFILE (VYORA)
+        // ==========================================
+        function openAdminProfile() {
+            document.getElementById('adminProfileModal').classList.add('open');
+            // Sedikit efek redup tanpa nutup klik
+            document.getElementById('chatBox').style.filter = "brightness(0.7)"; 
+        }
+
+        function closeAdminProfile() {
+            document.getElementById('adminProfileModal').classList.remove('open');
+            document.getElementById('chatBox').style.filter = "brightness(1)";
+        }
+
+        // ==========================================
+        // 💬 CHAT LOGIC (BENAR: USER KANAN)
+        // ==========================================
+        function sendMsg() {
+            const input = document.getElementById('chatInput');
+            const msg = input.value.trim();
+            if(msg === "") return;
+            db.ref('chats/' + activeUser).push({ sender: 'user', text: msg, timestamp: Date.now() });
+            input.value = "";
+        }
+        function handleEnter(e) { if(e.key === 'Enter') sendMsg(); }
+
+        function renderMessage(data) {
+            const chatBox = document.getElementById('chatBox');
+            let msgHTML = data.sender === 'user' 
+                ? `<div class="msg-row user"><div class="msg-bubble">${data.text}</div></div>`
+                : `<div class="msg-row admin"><div class="msg-bubble">${data.text}</div></div>`;
+            chatBox.innerHTML += msgHTML;
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+    </script>
+</body>
+</html>
