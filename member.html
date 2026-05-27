@@ -79,8 +79,9 @@
         /* 🌟 GATEKEEPER POP-UP (KUNCI HALAMAN) */
         .gatekeeper-theme {
             background: rgba(255, 240, 245, 0.98); 
-            z-index: 999; /* Paling depan menutupi semuanya */
+            z-index: 999; 
             display: flex; justify-content: center; align-items: center; padding: 20px;
+            transition: 0.5s ease;
         }
         .gatekeeper-card {
             background: #fff; border: 2px dashed rgba(255,126,179,0.5); border-radius: 24px;
@@ -132,7 +133,7 @@
         
         <div class="modal-overlay gatekeeper-theme open" id="gatekeeperModal">
             <div class="gatekeeper-card">
-                <img src="imut.jpg" class="admin-avatar" style="width: 85px; height: 85px; margin-bottom: 15px;" alt="Vyora">
+                <img src="imut.jpg" class="admin-avatar" style="width: 85px; height: 85px; margin-bottom: 15px;" alt="Vyora" onerror="this.src='https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'">
                 <h2 style="font-family:'Playfair Display'; color:var(--pink-dark); margin-bottom: 5px;">Security Check 🌸</h2>
                 <p style="font-size: 12.5px; color: #555; margin-bottom: 25px; line-height: 1.5;">
                     "hayiee, kalo mau lihat member, silahkan isi password dari admin dulu yaaw"
@@ -153,7 +154,7 @@
                 <i class="fas fa-crown icon-admin-trigger" onclick="promptAdmin()" title="Admin Area"></i> 
                 VVIP Member
             </h1>
-            <p class="header-subtitle">Daftar Akun Terverifikasi Wish by Vyora</p>
+            <p style="font-size:12px; color:#7f8c8d;">Daftar Akun Terverifikasi Wish by Vyora</p>
             
             <div class="search-wrapper">
                 <i class="fas fa-search search-icon"></i>
@@ -162,7 +163,8 @@
         </div>
 
         <div class="member-list-container" id="publicListArea">
-            </div>
+            <div style="text-align:center; color:#95a5a6; margin-top:50px;"><i class="fas fa-spinner fa-spin" style="font-size:30px;"></i><br><br>Memuat data dari server...</div>
+        </div>
 
         <button class="btn-floating-add" onclick="openForm()"><i class="fas fa-plus-circle"></i> Create Format</button>
 
@@ -220,26 +222,38 @@
         <div class="modal-overlay admin-theme" id="modalAdmin">
             <div class="modal-header">
                 <button class="btn-close" onclick="closeAdmin()"><i class="fas fa-chevron-down"></i></button>
-                <img src="imut.jpg" class="admin-avatar" alt="Vyora Admin">
+                <img src="imut.jpg" class="admin-avatar" alt="Vyora Admin" onerror="this.src='https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'">
                 <h2 style="font-family:'Playfair Display'; color:var(--pink-dark);">Ruang Admin Vyora 🌸</h2>
-                <p style="font-size:12px; color:#555;">Semua data asli ada di sini, hapus yang spam ya!</p>
+                <p style="font-size:12px; color:#555;">Semua data global tersinkron di sini, hapus yang spam ya!</p>
             </div>
             <div class="modal-body" id="adminListArea">
-                </div>
+                <div style="text-align:center; color:#95a5a6; margin-top:50px;"><i class="fas fa-spinner fa-spin" style="font-size:30px;"></i><br><br>Memuat data...</div>
+            </div>
         </div>
 
         <div class="bubble-toast" id="bubbleMsg">Pesan Error</div>
 
     </div>
 
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
     <script>
-        // ==========================================
-        // DATABASE LOKAL (DUMMY AWAL)
-        // ==========================================
-        let dbMembers = JSON.parse(localStorage.getItem('vyoraMembers')) || [
-            { id: 171600001, nama: "Bintang Putra", umur: 20, hp: "08123456", igRaw: "bintang_p", igClean: "@bintang_p", type: "vvip", date: "24 Mei 2026" },
-            { id: 171600002, nama: "Clarissa", umur: 19, hp: "08987654", igRaw: "https://ig.com/clarissa_v", igClean: "@clarissa_v", type: "member", date: "25 Mei 2026" }
-        ];
+        // INISIALISASI FIREBASE (GLOBAL SERVER)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBbuAkyL3pyvpNWG9u3EyPyhdQn4y7blkc",
+            authDomain: "juldev-command-center.firebaseapp.com",
+            databaseURL: "https://juldev-command-center-default-rtdb.firebaseio.com",
+            projectId: "juldev-command-center",
+            storageBucket: "juldev-command-center.firebasestorage.app",
+            messagingSenderId: "859594134847",
+            appId: "1:859594134847:web:83a11af82db0095bd22f8a"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // GLOBAL ARRAY PENAMPUNG DATA MEMBER
+        let dbMembers = [];
 
         function getTodayDate() {
             const months = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agt","Sep","Okt","Nov","Des"];
@@ -256,18 +270,63 @@
         }
 
         // ==========================================
-        // 🌟 GATEKEEPER LOGIC (KUNCI KEAMANAN AWAL)
+        // 🌟 GATEKEEPER LOGIC (SESSION PERSISTENCE)
         // ==========================================
+        // Cek pas halaman dibuka: Kalo memori bilang "udah unlocked", buka pintunya!
+        window.addEventListener('DOMContentLoaded', () => {
+            if(localStorage.getItem('memberGateUnlocked') === 'true') {
+                document.getElementById('gatekeeperModal').classList.remove('open');
+            }
+            
+            // Generate Partikel Background
+            const engine = document.getElementById('particleEngine');
+            for(let i = 0; i < 15; i++) {
+                let p = document.createElement('div');
+                p.className = 'particle'; 
+                let size = Math.random() * 15 + 5;
+                p.style.width = size + 'px'; p.style.height = size + 'px';
+                p.style.left = Math.random() * 100 + 'vw'; 
+                p.style.animationDuration = (Math.random() * 10 + 5) + 's';
+                p.style.animationDelay = Math.random() * 5 + 's'; 
+                engine.appendChild(p);
+            }
+
+            loadUserCache();
+            listenToFirebase(); // Colokin ke server Global
+        });
+
         function unlockGate() {
             let pw = document.getElementById('gatePw').value;
             if (pw === '123454321') {
                 document.getElementById('gatekeeperModal').classList.remove('open');
+                // Simpan kunci ajaibnya biar direfresh tetep masuk!
+                localStorage.setItem('memberGateUnlocked', 'true');
                 showBubble("Akses Diterima! Selamat datang 💕");
-                // Bersihin kolom pw nya buat estetik
                 document.getElementById('gatePw').value = ''; 
             } else {
                 showBubble("Password salah bestie! 😝");
             }
+        }
+
+        // ==========================================
+        // 🔥 FIREBASE REALTIME SYNC (THE MAGIC!)
+        // ==========================================
+        function listenToFirebase() {
+            // Ini yang bikin browser A dan B tersinkron. Setiap ada yg ngisi form, otomatis kepanggil!
+            db.ref('members').on('value', snap => {
+                dbMembers = []; // Kosongin mangkoknya dulu
+                snap.forEach(child => {
+                    // Masukin data plus "kunci rahasia" firebase (buat fungsi hapus nanti)
+                    dbMembers.push({ key: child.key, ...child.val() }); 
+                });
+                
+                renderPublic(); // Render ulang ke layar Publik
+                
+                // Kalau admin panel lagi kebuka, render ulang juga layar adminnya
+                if(document.getElementById('modalAdmin').classList.contains('open')) {
+                    renderAdmin();
+                }
+            });
         }
 
         // ==========================================
@@ -282,7 +341,10 @@
                 return;
             }
 
-            dbMembers.reverse().forEach((m, index) => {
+            // Balik urutan dari yang paling baru daftar
+            const displayList = [...dbMembers].reverse();
+
+            displayList.forEach((m, index) => {
                 let badge = m.type === 'vvip' 
                     ? `<div class="badge-vvip"><i class="fas fa-star"></i> VVIP</div>` 
                     : `<div class="badge-member"><i class="fas fa-user"></i> Member</div>`;
@@ -290,7 +352,7 @@
                 let avatarIcon = m.type === 'vvip' ? `<i class="fas fa-crown" style="color:var(--pink-main)"></i>` : `<i class="fas fa-user"></i>`;
 
                 let card = `
-                <div class="member-card public-item" style="animation-delay: ${index * 0.1}s;">
+                <div class="member-card public-item" style="animation-delay: ${index * 0.05}s;">
                     <div class="member-info">
                         <div class="member-avatar">${avatarIcon}</div>
                         <div class="member-details">
@@ -302,17 +364,24 @@
                 </div>`;
                 container.innerHTML += card;
             });
-            dbMembers.reverse(); 
         }
 
         function renderAdmin() {
             const container = document.getElementById('adminListArea');
             container.innerHTML = "";
-            dbMembers.reverse().forEach(m => {
+            
+            if(dbMembers.length === 0) {
+                container.innerHTML = `<div style="text-align:center; color:#95a5a6; margin-top:50px;"><br>Server kosong kak.</div>`;
+                return;
+            }
+
+            const displayList = [...dbMembers].reverse();
+            
+            displayList.forEach(m => {
                 let typeColor = m.type === 'vvip' ? 'var(--pink-dark)' : '#2980b9';
                 let card = `
                 <div class="admin-card">
-                    <button class="btn-delete" onclick="deleteData(${m.id})"><i class="fas fa-trash"></i></button>
+                    <button class="btn-delete" onclick="deleteData('${m.key}')"><i class="fas fa-trash"></i></button>
                     <div class="admin-data">
                         <p><b>Nama:</b> ${m.nama}</p>
                         <p><b>Umur:</b> ${m.umur} Tahun</p>
@@ -324,11 +393,10 @@
                 </div>`;
                 container.innerHTML += card;
             });
-            dbMembers.reverse();
         }
 
         // ==========================================
-        // SMART AUTO-FILL
+        // SMART AUTO-FILL (Ini tetep lokal gapapa)
         // ==========================================
         function loadUserCache() {
             let cacheData = JSON.parse(localStorage.getItem('vyoraUserCache'));
@@ -342,7 +410,7 @@
         }
 
         // ==========================================
-        // LOGIKA FORM REGISTRASI
+        // LOGIKA FORM REGISTRASI (CREATE TO FIREBASE)
         // ==========================================
         function openForm() { document.getElementById('modalForm').classList.add('open'); }
         function closeForm() { document.getElementById('modalForm').classList.remove('open'); }
@@ -373,30 +441,38 @@
                 showBubble("Password Admin salah! Form ditolak 🛑"); return;
             }
 
+            // Simpen ke memori HP dia biar ngga ngetik ulang lain kali
             let userCache = { nama: nama, umur: umur, hp: hp, ig: ig };
             localStorage.setItem('vyoraUserCache', JSON.stringify(userCache));
 
+            // Bikin objek data baru
             let newMember = {
-                id: Date.now(),
-                nama: nama, umur: umur, hp: hp, igRaw: ig,
-                igClean: cleanIG(ig), type: type, date: getTodayDate()
+                nama: nama, 
+                umur: umur, 
+                hp: hp, 
+                igRaw: ig,
+                igClean: cleanIG(ig), 
+                type: type, 
+                date: getTodayDate()
             };
 
-            dbMembers.push(newMember);
-            localStorage.setItem('vyoraMembers', JSON.stringify(dbMembers));
-            
-            document.getElementById('regPwVvip').value = "";
-            document.getElementById('regPwAdmin').value = "";
-            document.getElementById('regType').value = "member";
-            checkType();
+            // 🔥 Tembak data ke SERVER FIREBASE
+            db.ref('members').push(newMember).then(() => {
+                // Kalo sukses, bersihin form password dll
+                document.getElementById('regPwVvip').value = "";
+                document.getElementById('regPwAdmin').value = "";
+                document.getElementById('regType').value = "member";
+                checkType();
 
-            closeForm();
-            renderPublic();
-            showBubble("Yey! Data berhasil ditambahkan ke List 🎉");
+                closeForm();
+                showBubble("Yey! Data berhasil disinkron ke Global Server 🎉");
+            }).catch(error => {
+                showBubble("Gagal kirim data ke server. Cek internet lu lur! 🛑");
+            });
         }
 
         // ==========================================
-        // LOGIKA ADMIN PANEL & HAPUS
+        // LOGIKA ADMIN PANEL & HAPUS FIREBASE
         // ==========================================
         function promptAdmin() {
             let pwd = prompt("Masukkan Password Khusus Admin:");
@@ -411,18 +487,17 @@
 
         function closeAdmin() { document.getElementById('modalAdmin').classList.remove('open'); }
 
-        function deleteData(id) {
-            if(confirm("Yakin mau hapus data ini kak?")) {
-                dbMembers = dbMembers.filter(m => m.id !== id);
-                localStorage.setItem('vyoraMembers', JSON.stringify(dbMembers));
-                renderAdmin();
-                renderPublic();
-                showBubble("Data berhasil dihapus! 🗑️");
+        function deleteData(firebaseKey) {
+            if(confirm("Yakin mau hapus data ini kak? Bakal ilang dari semua HP lho!")) {
+                // 🔥 Hapus node dari Firebase berdasarkan kuncinya
+                db.ref('members/' + firebaseKey).remove().then(() => {
+                    showBubble("Data berhasil dihapus dari Cloud! 🗑️");
+                });
             }
         }
 
         // ==========================================
-        // FITUR TAMBAHAN
+        // FITUR TAMBAHAN (Search, Toast, Exit)
         // ==========================================
         function searchPublicList() {
             let input = document.getElementById('searchInput').value.toLowerCase();
@@ -449,27 +524,13 @@
                 btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
                 btn.disabled = true;
             }
+            // 🔥 HAPUS KUNCI PINTU, biar besok dia ditagih password lagi
+            localStorage.removeItem('memberGateUnlocked');
+
             document.getElementById('mainFrame').classList.add('exiting');
             setTimeout(() => { window.location.assign('myOnce.html'); }, 500); 
         }
 
-        // INIT
-        window.addEventListener('DOMContentLoaded', () => {
-            renderPublic();
-            loadUserCache();
-
-            const engine = document.getElementById('particleEngine');
-            for(let i = 0; i < 15; i++) {
-                let p = document.createElement('div');
-                p.className = 'particle'; 
-                let size = Math.random() * 15 + 5;
-                p.style.width = size + 'px'; p.style.height = size + 'px';
-                p.style.left = Math.random() * 100 + 'vw'; 
-                p.style.animationDuration = (Math.random() * 10 + 5) + 's';
-                p.style.animationDelay = Math.random() * 5 + 's'; 
-                engine.appendChild(p);
-            }
-        });
     </script>
 </body>
 </html>
