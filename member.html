@@ -55,7 +55,27 @@
         /* List Publik */
         .member-list-container { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; scrollbar-width: none; padding-bottom: 80px; }
         .member-list-container::-webkit-scrollbar { display: none; }
-        .member-card { background: #fff; border: 1px solid rgba(0,0,0,0.04); border-radius: 18px; padding: 15px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
+        
+        .member-card { background: #fff; border: 1px solid rgba(0,0,0,0.04); border-radius: 18px; padding: 15px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 10px rgba(0,0,0,0.02); transition: var(--transition); }
+        
+        /* 🔥 EFFECT CARD VVIP MENYALA-NYALA (LUXURY GLOW) */
+        .member-card.vvip-luxe {
+            background: linear-gradient(135deg, #fff 0%, #FFF0F5 100%);
+            border: 2px solid var(--pink-main);
+            animation: luxuryGlow 2s infinite alternate ease-in-out;
+        }
+        @keyframes luxuryGlow {
+            0% {
+                box-shadow: 0 0 10px rgba(255, 126, 179, 0.4), inset 0 0 10px rgba(255,126,179,0.02);
+                border-color: rgba(255, 126, 179, 0.6);
+            }
+            100% {
+                box-shadow: 0 0 25px rgba(214, 51, 108, 0.75), inset 0 0 15px rgba(214,51,108,0.1);
+                border-color: rgba(214, 51, 108, 1);
+                transform: scale(1.01);
+            }
+        }
+
         .member-info { display: flex; align-items: center; gap: 12px; }
         .member-avatar { width: 45px; height: 45px; border-radius: 50%; background: linear-gradient(135deg, #f1f2f6, #dfe4ea); display: flex; justify-content: center; align-items: center; font-size: 18px; color: #a4b0be; border: 2px solid #fff; overflow: hidden; }
         .member-ig { font-size: 14px; font-weight: 600; color: #2C3E50; display: flex; align-items: center; gap: 5px; }
@@ -239,7 +259,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // INISIALISASI FIREBASE (GLOBAL SERVER)
+        // CONFIG FIREBASE ASLI LU
         const firebaseConfig = {
             apiKey: "AIzaSyBbuAkyL3pyvpNWG9u3EyPyhdQn4y7blkc",
             authDomain: "juldev-command-center.firebaseapp.com",
@@ -252,7 +272,6 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // GLOBAL ARRAY PENAMPUNG DATA MEMBER
         let dbMembers = [];
 
         function getTodayDate() {
@@ -270,15 +289,15 @@
         }
 
         // ==========================================
-        // 🌟 GATEKEEPER LOGIC (SESSION PERSISTENCE)
+        // 🔒 LOGIKA KEEP SESSION GATEKEEPER
         // ==========================================
-        // Cek pas halaman dibuka: Kalo memori bilang "udah unlocked", buka pintunya!
         window.addEventListener('DOMContentLoaded', () => {
+            // Jika memori localstorage true, bypass password gatekeeper langsung masuk
             if(localStorage.getItem('memberGateUnlocked') === 'true') {
                 document.getElementById('gatekeeperModal').classList.remove('open');
             }
             
-            // Generate Partikel Background
+            // Particle Generator
             const engine = document.getElementById('particleEngine');
             for(let i = 0; i < 15; i++) {
                 let p = document.createElement('div');
@@ -292,15 +311,14 @@
             }
 
             loadUserCache();
-            listenToFirebase(); // Colokin ke server Global
+            listenToFirebase(); 
         });
 
         function unlockGate() {
             let pw = document.getElementById('gatePw').value;
             if (pw === '123454321') {
                 document.getElementById('gatekeeperModal').classList.remove('open');
-                // Simpan kunci ajaibnya biar direfresh tetep masuk!
-                localStorage.setItem('memberGateUnlocked', 'true');
+                localStorage.setItem('memberGateUnlocked', 'true'); // Ikat session biar ga ke-reset pas refresh
                 showBubble("Akses Diterima! Selamat datang 💕");
                 document.getElementById('gatePw').value = ''; 
             } else {
@@ -309,29 +327,24 @@
         }
 
         // ==========================================
-        // 🔥 FIREBASE REALTIME SYNC (THE MAGIC!)
+        // 📡 FIREBASE SYNCHRONIZATION & DEWA SORTING
         // ==========================================
         function listenToFirebase() {
-            // Ini yang bikin browser A dan B tersinkron. Setiap ada yg ngisi form, otomatis kepanggil!
             db.ref('members').on('value', snap => {
-                dbMembers = []; // Kosongin mangkoknya dulu
+                dbMembers = []; 
                 snap.forEach(child => {
-                    // Masukin data plus "kunci rahasia" firebase (buat fungsi hapus nanti)
                     dbMembers.push({ key: child.key, ...child.val() }); 
                 });
                 
-                renderPublic(); // Render ulang ke layar Publik
+                renderPublic(); 
                 
-                // Kalau admin panel lagi kebuka, render ulang juga layar adminnya
                 if(document.getElementById('modalAdmin').classList.contains('open')) {
                     renderAdmin();
                 }
             });
         }
 
-        // ==========================================
-        // RENDERING ENGINE
-        // ==========================================
+        // RENDERING ENGINE DENGAN URUTAN PRIORITAS VVIP
         function renderPublic() {
             const container = document.getElementById('publicListArea');
             container.innerHTML = "";
@@ -341,8 +354,12 @@
                 return;
             }
 
-            // Balik urutan dari yang paling baru daftar
-            const displayList = [...dbMembers].reverse();
+            // 🔥 LOGIKA DEWA: Balik urutan chronological (Newest first), lalu paksa VVIP naik ke paling atas!
+            const displayList = [...dbMembers].reverse().sort((a, b) => {
+                if (a.type === 'vvip' && b.type !== 'vvip') return -1;
+                if (a.type !== 'vvip' && b.type === 'vvip') return 1;
+                return 0; // Pertahanin urutan waktu murni
+            });
 
             displayList.forEach((m, index) => {
                 let badge = m.type === 'vvip' 
@@ -350,9 +367,12 @@
                     : `<div class="badge-member"><i class="fas fa-user"></i> Member</div>`;
                 
                 let avatarIcon = m.type === 'vvip' ? `<i class="fas fa-crown" style="color:var(--pink-main)"></i>` : `<i class="fas fa-user"></i>`;
+                
+                // Pasang class vvip-luxe biar dapet efek glow animasi berpendar
+                let cardClass = m.type === 'vvip' ? 'member-card public-item vvip-luxe' : 'member-card public-item';
 
                 let card = `
-                <div class="member-card public-item" style="animation-delay: ${index * 0.05}s;">
+                <div class="${cardClass}" style="animation-delay: ${index * 0.05}s;">
                     <div class="member-info">
                         <div class="member-avatar">${avatarIcon}</div>
                         <div class="member-details">
@@ -375,7 +395,12 @@
                 return;
             }
 
-            const displayList = [...dbMembers].reverse();
+            // Admin panel juga ikutan urut VVIP paling atas biar Kak Vyora gampang nge-cek
+            const displayList = [...dbMembers].reverse().sort((a, b) => {
+                if (a.type === 'vvip' && b.type !== 'vvip') return -1;
+                if (a.type !== 'vvip' && b.type === 'vvip') return 1;
+                return 0;
+            });
             
             displayList.forEach(m => {
                 let typeColor = m.type === 'vvip' ? 'var(--pink-dark)' : '#2980b9';
@@ -396,7 +421,7 @@
         }
 
         // ==========================================
-        // SMART AUTO-FILL (Ini tetep lokal gapapa)
+        // SMART AUTO-FILL CACHE
         // ==========================================
         function loadUserCache() {
             let cacheData = JSON.parse(localStorage.getItem('vyoraUserCache'));
@@ -410,7 +435,7 @@
         }
 
         // ==========================================
-        // LOGIKA FORM REGISTRASI (CREATE TO FIREBASE)
+        // SUBMIT FORM TO CLOUD SERVER
         // ==========================================
         function openForm() { document.getElementById('modalForm').classList.add('open'); }
         function closeForm() { document.getElementById('modalForm').classList.remove('open'); }
@@ -441,38 +466,28 @@
                 showBubble("Password Admin salah! Form ditolak 🛑"); return;
             }
 
-            // Simpen ke memori HP dia biar ngga ngetik ulang lain kali
             let userCache = { nama: nama, umur: umur, hp: hp, ig: ig };
             localStorage.setItem('vyoraUserCache', JSON.stringify(userCache));
 
-            // Bikin objek data baru
             let newMember = {
-                nama: nama, 
-                umur: umur, 
-                hp: hp, 
-                igRaw: ig,
-                igClean: cleanIG(ig), 
-                type: type, 
-                date: getTodayDate()
+                nama: nama, umur: umur, hp: hp, igRaw: ig,
+                igClean: cleanIG(ig), type: type, date: getTodayDate()
             };
 
-            // 🔥 Tembak data ke SERVER FIREBASE
             db.ref('members').push(newMember).then(() => {
-                // Kalo sukses, bersihin form password dll
                 document.getElementById('regPwVvip').value = "";
                 document.getElementById('regPwAdmin').value = "";
                 document.getElementById('regType').value = "member";
                 checkType();
-
                 closeForm();
-                showBubble("Yey! Data berhasil disinkron ke Global Server 🎉");
+                showBubble("Yey! Data berhasil disinkron ke Global Cloud Server 🎉");
             }).catch(error => {
-                showBubble("Gagal kirim data ke server. Cek internet lu lur! 🛑");
+                showBubble("Gagal kirim data ke server Cloud 🛑");
             });
         }
 
         // ==========================================
-        // LOGIKA ADMIN PANEL & HAPUS FIREBASE
+        // ADMIN INTERFACE
         // ==========================================
         function promptAdmin() {
             let pwd = prompt("Masukkan Password Khusus Admin:");
@@ -489,15 +504,14 @@
 
         function deleteData(firebaseKey) {
             if(confirm("Yakin mau hapus data ini kak? Bakal ilang dari semua HP lho!")) {
-                // 🔥 Hapus node dari Firebase berdasarkan kuncinya
                 db.ref('members/' + firebaseKey).remove().then(() => {
-                    showBubble("Data berhasil dihapus dari Cloud! 🗑️");
+                    showBubble("Data berhasil dihapus dari Cloud Server! 🗑️");
                 });
             }
         }
 
         // ==========================================
-        // FITUR TAMBAHAN (Search, Toast, Exit)
+        // UTILITIES
         // ==========================================
         function searchPublicList() {
             let input = document.getElementById('searchInput').value.toLowerCase();
@@ -524,13 +538,12 @@
                 btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
                 btn.disabled = true;
             }
-            // 🔥 HAPUS KUNCI PINTU, biar besok dia ditagih password lagi
+            // Bakar session gatekeeper waktu keluar ke lobby biar aman ketat lagi
             localStorage.removeItem('memberGateUnlocked');
 
             document.getElementById('mainFrame').classList.add('exiting');
             setTimeout(() => { window.location.assign('myOnce.html'); }, 500); 
         }
-
     </script>
 </body>
 </html>
